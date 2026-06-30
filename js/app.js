@@ -990,6 +990,14 @@ const App = {
     else this.renderRecords();
   },
 
+  jumpPage(tab, value) {
+    const page = parseInt(value);
+    if (isNaN(page) || page < 1) return;
+    this.currentPage[tab] = page;
+    if (tab === 'overview') this.renderOverview();
+    else this.renderRecords();
+  },
+
   paginate(data, tab) {
     const total = data.length;
     const totalPages = Math.max(1, Math.ceil(total / this.pageSize));
@@ -998,10 +1006,13 @@ const App = {
     const pageData = data.slice(start, start + this.pageSize);
 
     const pagEl = document.getElementById(`${tab}-pagination`);
-    const infoEl = document.getElementById(`${tab}-page-info`);
+    const inputEl = document.getElementById(`${tab}-page-input`);
+    const totalEl = document.getElementById(`${tab}-total-pages`);
     if (total > this.pageSize) {
       pagEl.style.display = 'flex';
-      infoEl.textContent = `${this.currentPage[tab]} / ${totalPages}`;
+      if (inputEl) inputEl.value = this.currentPage[tab];
+      if (inputEl) inputEl.max = totalPages;
+      if (totalEl) totalEl.textContent = totalPages;
     } else {
       pagEl.style.display = 'none';
     }
