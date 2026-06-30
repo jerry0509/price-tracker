@@ -3,16 +3,16 @@ const Store = {
   CATEGORIES_KEY: 'price-tracker-categories',
   CHANNELS_KEY: 'price-tracker-channels',
   VERSION_KEY: 'price-tracker-version',
-  CURRENT_VERSION: '2.0',
+  CURRENT_VERSION: '3.0',
 
   defaultCategories: ['日用品', '蔬菜', '水果', '肉类', '零食', '饮料', '个护', '电子', '其他'],
   defaultChannels: ['京东', '淘宝', '拼多多', '大润发', '盒马', '山姆', '永辉', '美团', '其他'],
 
   defaultPurchases: [
-    { id: 'd01', itemId: 'item-tissue', itemName: '抽纸', category: '日用品', price: 35, quantity: 10, totalPrice: 350, channel: '京东', date: '2026-01-08', notes: '年货节' },
-    { id: 'd02', itemId: 'item-tissue', itemName: '抽纸', category: '日用品', price: 28, quantity: 5, totalPrice: 140, channel: '拼多多', date: '2026-02-15', notes: '' },
-    { id: 'd03', itemId: 'item-tissue', itemName: '抽纸', category: '日用品', price: 32, quantity: 8, totalPrice: 256, channel: '大润发', date: '2026-04-20', notes: '特价' },
-    { id: 'd04', itemId: 'item-tissue', itemName: '抽纸', category: '日用品', price: 30, quantity: 6, totalPrice: 180, channel: '盒马', date: '2026-06-10', notes: '' },
+    { id: 'd01', itemId: 'item-tissue', itemName: '抽纸', category: '日用品', price: 35, quantity: 10, totalPrice: 350, channel: '京东', date: '2026-01-08', notes: '年货节', specQty: 120, specUnit: '抽', isPromo: true, promoType: '满减', actualPaid: 320 },
+    { id: 'd02', itemId: 'item-tissue', itemName: '抽纸', category: '日用品', price: 28, quantity: 5, totalPrice: 140, channel: '拼多多', date: '2026-02-15', notes: '', specQty: 110, specUnit: '抽' },
+    { id: 'd03', itemId: 'item-tissue', itemName: '抽纸', category: '日用品', price: 32, quantity: 8, totalPrice: 256, channel: '大润发', date: '2026-04-20', notes: '特价', specQty: 130, specUnit: '抽', isPromo: true, promoType: '买一送一', actualPaid: 128 },
+    { id: 'd04', itemId: 'item-tissue', itemName: '抽纸', category: '日用品', price: 30, quantity: 6, totalPrice: 180, channel: '盒马', date: '2026-06-10', notes: '', specQty: 120, specUnit: '抽' },
 
     { id: 'd05', itemId: 'item-shampoo', itemName: '洗发水', category: '个护', price: 49, quantity: 2, totalPrice: 98, channel: '京东', date: '2026-01-20', notes: '' },
     { id: 'd06', itemId: 'item-shampoo', itemName: '洗发水', category: '个护', price: 45, quantity: 1, totalPrice: 45, channel: '山姆', date: '2026-04-05', notes: '大瓶装' },
@@ -26,15 +26,15 @@ const Store = {
     { id: 'd12', itemId: 'item-rice', itemName: '大米', category: '食品', price: 65, quantity: 1, totalPrice: 65, channel: '盒马', date: '2026-03-30', notes: '东北大米' },
     { id: 'd13', itemId: 'item-rice', itemName: '大米', category: '食品', price: 55, quantity: 1, totalPrice: 55, channel: '大润发', date: '2026-06-05', notes: '' },
 
-    { id: 'd14', itemId: 'item-eggs', itemName: '鸡蛋', category: '食品', price: 18, quantity: 2, totalPrice: 36, channel: '盒马', date: '2026-01-10', notes: '' },
-    { id: 'd15', itemId: 'item-eggs', itemName: '鸡蛋', category: '食品', price: 15, quantity: 2, totalPrice: 30, channel: '永辉', date: '2026-02-20', notes: '30枚装' },
-    { id: 'd16', itemId: 'item-eggs', itemName: '鸡蛋', category: '食品', price: 20, quantity: 1, totalPrice: 20, channel: '美团', date: '2026-04-12', notes: '' },
-    { id: 'd17', itemId: 'item-eggs', itemName: '鸡蛋', category: '食品', price: 16, quantity: 2, totalPrice: 32, channel: '大润发', date: '2026-06-18', notes: '' },
+    { id: 'd14', itemId: 'item-eggs', itemName: '鸡蛋', category: '食品', price: 18, quantity: 2, totalPrice: 36, channel: '盒马', date: '2026-01-10', notes: '', specQty: 10, specUnit: '枚' },
+    { id: 'd15', itemId: 'item-eggs', itemName: '鸡蛋', category: '食品', price: 15, quantity: 2, totalPrice: 30, channel: '永辉', date: '2026-02-20', notes: '30枚装', specQty: 30, specUnit: '枚' },
+    { id: 'd16', itemId: 'item-eggs', itemName: '鸡蛋', category: '食品', price: 20, quantity: 1, totalPrice: 20, channel: '美团', date: '2026-04-12', notes: '', specQty: 10, specUnit: '枚' },
+    { id: 'd17', itemId: 'item-eggs', itemName: '鸡蛋', category: '食品', price: 16, quantity: 2, totalPrice: 32, channel: '大润发', date: '2026-06-18', notes: '', specQty: 12, specUnit: '枚' },
 
-    { id: 'd18', itemId: 'item-milk', itemName: '牛奶', category: '饮料', price: 55, quantity: 2, totalPrice: 110, channel: '山姆', date: '2026-01-05', notes: '鲜奶' },
-    { id: 'd19', itemId: 'item-milk', itemName: '牛奶', category: '饮料', price: 49, quantity: 2, totalPrice: 98, channel: '盒马', date: '2026-03-08', notes: '' },
-    { id: 'd20', itemId: 'item-milk', itemName: '牛奶', category: '饮料', price: 58, quantity: 1, totalPrice: 58, channel: '山姆', date: '2026-05-15', notes: '' },
-    { id: 'd21', itemId: 'item-milk', itemName: '牛奶', category: '饮料', price: 52, quantity: 2, totalPrice: 104, channel: '美团', date: '2026-06-28', notes: '' },
+    { id: 'd18', itemId: 'item-milk', itemName: '牛奶', category: '饮料', price: 55, quantity: 2, totalPrice: 110, channel: '山姆', date: '2026-01-05', notes: '鲜奶', specQty: 1000, specUnit: 'ml' },
+    { id: 'd19', itemId: 'item-milk', itemName: '牛奶', category: '饮料', price: 49, quantity: 2, totalPrice: 98, channel: '盒马', date: '2026-03-08', notes: '', specQty: 950, specUnit: 'ml' },
+    { id: 'd20', itemId: 'item-milk', itemName: '牛奶', category: '饮料', price: 58, quantity: 1, totalPrice: 58, channel: '山姆', date: '2026-05-15', notes: '', specQty: 1000, specUnit: 'ml' },
+    { id: 'd21', itemId: 'item-milk', itemName: '牛奶', category: '饮料', price: 52, quantity: 2, totalPrice: 104, channel: '美团', date: '2026-06-28', notes: '', specQty: 250, specUnit: 'ml' },
 
     { id: 'd22', itemId: 'item-apple', itemName: '苹果', category: '水果', price: 35, quantity: 1, totalPrice: 35, channel: '盒马', date: '2026-01-18', notes: '红富士' },
     { id: 'd23', itemId: 'item-apple', itemName: '苹果', category: '水果', price: 28, quantity: 2, totalPrice: 56, channel: '美团', date: '2026-03-22', notes: '' },
@@ -167,7 +167,8 @@ const Store = {
           id: p.itemId,
           name: p.itemName,
           category: p.category,
-          purchases: []
+          purchases: [],
+          specUnit: p.specUnit || null
         };
       }
       itemsMap[p.itemId].purchases.push(p);
@@ -182,6 +183,18 @@ const Store = {
       const totalPurchases = item.purchases.length;
       const totalQuantity = item.purchases.reduce((sum, p) => sum + p.quantity, 0);
 
+      // 归一化单价
+      const specPurchases = item.purchases.filter(p => p.specQty && p.specUnit);
+      let unitPrice = null;
+      if (specPurchases.length > 0) {
+        const unitPrices = specPurchases.map(p => {
+          const totalUnits = p.specQty * p.quantity;
+          const paid = p.actualPaid || p.totalPrice;
+          return paid / totalUnits;
+        });
+        unitPrice = unitPrices.reduce((a, b) => a + b, 0) / unitPrices.length;
+      }
+
       const sortedPurchases = [...item.purchases].sort((a, b) => new Date(a.date) - new Date(b.date));
       const avgDuration = this.calculateAvgDuration(sortedPurchases);
       const dailyCost = avgDuration ? avgPrice / avgDuration : null;
@@ -195,7 +208,9 @@ const Store = {
         totalPurchases,
         totalQuantity,
         avgDuration,
-        dailyCost
+        dailyCost,
+        unitPrice,
+        specUnit: item.specUnit
       };
     });
 

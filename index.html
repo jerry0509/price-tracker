@@ -67,6 +67,7 @@
               <th>最便宜渠道</th>
               <th data-sort="totalPurchases">次数 <span class="sort-arrow">↕</span></th>
               <th data-sort="avgDuration">时长 <span class="sort-arrow">↕</span></th>
+              <th>单位价格</th>
               <th data-sort="dailyCost" class="sorted">日均 <span class="sort-arrow">↓</span></th>
               <th>操作</th>
             </tr></thead>
@@ -165,22 +166,22 @@
       <div class="charts-row" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
         <div class="chart-card">
           <h3><span class="chart-icon">📦</span> 分类消费占比</h3>
-          <div id="chart-category"></div>
+          <div id="chart-category" class="chart-card-scroll"></div>
         </div>
         <div class="chart-card">
           <h3><span class="chart-icon">🏪</span> 渠道消费占比</h3>
-          <div id="chart-channel"></div>
+          <div id="chart-channel" class="chart-card-scroll"></div>
         </div>
       </div>
 
       <div class="charts-row" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
         <div class="chart-card">
           <h3><span class="chart-icon">📈</span> <span id="monthly-title">月度消费趋势</span></h3>
-          <div id="chart-monthly" class="bar-chart"></div>
+          <div id="chart-monthly" class="bar-chart chart-card-scroll"></div>
         </div>
         <div class="chart-card">
           <h3><span class="chart-icon">💰</span> 日均成本排行</h3>
-          <div id="chart-daily-cost" class="bar-chart"></div>
+          <div id="chart-daily-cost" class="bar-chart chart-card-scroll"></div>
         </div>
       </div>
     </main>
@@ -278,6 +279,46 @@
           <div class="form-group">
             <label>日期 <span class="required">*</span></label>
             <input class="input" type="date" id="item-date" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group" style="max-width:140px">
+            <label>规格数量</label>
+            <input class="input" type="number" id="item-spec-qty" placeholder="如120" min="1">
+          </div>
+          <div class="form-group" style="max-width:140px">
+            <label>规格单位</label>
+            <input class="input" id="item-spec-unit" placeholder="抽/枚/ml/kg..." list="spec-unit-list" autocomplete="off">
+            <datalist id="spec-unit-list">
+              <option value="抽"><option value="枚"><option value="片"><option value="个">
+              <option value="ml"><option value="L"><option value="g"><option value="kg">
+              <option value="包"><option value="卷"><option value="袋"><option value="瓶">
+              <option value="盒"><option value="罐"><option value="条"><option value="块">
+            </datalist>
+          </div>
+          <div class="form-group" style="flex:0 0 auto;display:flex;align-items:end;gap:8px">
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;margin-bottom:8px">
+              <input type="checkbox" id="item-is-promo" style="accent-color:var(--warning)"> 🏷️ 促销
+            </label>
+          </div>
+        </div>
+        <div class="form-row" id="promo-fields" style="display:none">
+          <div class="form-group">
+            <label>促销方式</label>
+            <select class="input" id="item-promo-type">
+              <option value="">选择促销方式</option>
+              <option value="买一送一">买一送一</option>
+              <option value="第二件半价">第二件半价</option>
+              <option value="限时特价">限时特价</option>
+              <option value="满减">满减</option>
+              <option value="优惠券">优惠券</option>
+              <option value="折扣">折扣</option>
+              <option value="其他">其他</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>实付金额</label>
+            <input class="input" type="number" id="item-actual-paid" placeholder="留空=按总价算" step="0.01" min="0">
           </div>
         </div>
         <div class="form-row">

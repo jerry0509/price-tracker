@@ -99,6 +99,10 @@ const App = {
       this.savePurchase();
     });
 
+    document.getElementById('item-is-promo')?.addEventListener('change', e => {
+      document.getElementById('promo-fields').style.display = e.target.checked ? 'flex' : 'none';
+    });
+
     document.getElementById('item-name')?.addEventListener('input', Utils.debounce(e => {
       this.handleItemNameInput(e.target.value);
     }, 200));
@@ -151,7 +155,10 @@ const App = {
 
     tbody.innerHTML = items.map(item => `
       <tr>
-        <td><strong>${Utils.escapeHtml(item.name)}</strong></td>
+        <td>
+          <strong>${Utils.escapeHtml(item.name)}</strong>
+          ${item.specUnit ? `<span class="spec-tag">${item.specUnit}</span>` : ''}
+        </td>
         <td><span class="tag">${Utils.escapeHtml(item.category)}</span></td>
         <td class="price">${Utils.formatPrice(item.maxPrice)}</td>
         <td class="price">${Utils.formatPrice(item.minPrice)}</td>
@@ -159,6 +166,7 @@ const App = {
         <td>${Utils.escapeHtml(item.cheapestChannel)}</td>
         <td>${item.totalPurchases}次</td>
         <td>${Utils.formatDuration(item.avgDuration)}</td>
+        <td class="price">${item.unitPrice !== null ? '¥' + item.unitPrice.toFixed(4) + '/' + item.specUnit : '-'}</td>
         <td class="price">
           <strong class="${Utils.getCostColorClass(item.dailyCost)}">
             ${item.dailyCost ? Utils.formatPrice(item.dailyCost) : 'N/A'}
@@ -288,11 +296,17 @@ const App = {
     tbody.innerHTML = purchases.map(p => `
       <tr>
         <td>${Utils.escapeHtml(p.date)}</td>
-        <td><strong>${Utils.escapeHtml(p.itemName)}</strong></td>
+        <td>
+          <strong>${Utils.escapeHtml(p.itemName)}</strong>
+          ${p.specQty && p.specUnit ? `<span class="spec-tag">${p.specQty}${p.specUnit}/份</span>` : ''}
+          ${p.isPromo ? `<span class="promo-badge">🏷️${p.promoType || '促销'}</span>` : ''}
+        </td>
         <td><span class="tag">${Utils.escapeHtml(p.category)}</span></td>
         <td class="price">${Utils.formatPrice(p.price)}</td>
         <td>${p.quantity}</td>
-        <td class="price">${Utils.formatPrice(p.totalPrice)}</td>
+        <td class="price">
+          ${p.isPromo && p.actualPaid ? `<s style="color:var(--text-muted);font-size:11px">${Utils.formatPrice(p.totalPrice)}</s> ${Utils.formatPrice(p.actualPaid)}` : Utils.formatPrice(p.totalPrice)}
+        </td>
         <td>${Utils.escapeHtml(p.channel)}</td>
         <td style="color:var(--text-secondary)">${Utils.escapeHtml(p.notes || '')}</td>
         <td>
@@ -397,11 +411,18 @@ const App = {
       document.getElementById('item-channel').value = purchase.channel;
       document.getElementById('item-date').value = purchase.date;
       document.getElementById('item-notes').value = purchase.notes || '';
+      document.getElementById('item-spec-qty').value = purchase.specQty || '';
+      document.getElementById('item-spec-unit').value = purchase.specUnit || '';
+      document.getElementById('item-is-promo').checked = !!purchase.isPromo;
+      document.getElementById('item-promo-type').value = purchase.promoType || '';
+      document.getElementById('item-actual-paid').value = purchase.actualPaid || '';
+      document.getElementById('promo-fields').style.display = purchase.isPromo ? 'flex' : 'none';
     } else {
       form.reset();
       document.getElementById('item-id').value = '';
       document.getElementById('item-date').value = Utils.formatDate(new Date());
       document.getElementById('item-quantity').value = '1';
+      document.getElementById('promo-fields').style.display = 'none';
     }
 
     this.updateCategorySelect();
@@ -435,6 +456,11 @@ const App = {
     const channel = document.getElementById('item-channel').value.trim() || '其他';
     const date = document.getElementById('item-date').value;
     const notes = document.getElementById('item-notes').value.trim();
+    const specQty = parseInt(document.getElementById('item-spec-qty').value) || null;
+    const specUnit = document.getElementById('item-spec-unit').value.trim() || null;
+    const isPromo = document.getElementById('item-is-promo').checked;
+    const promoType = document.getElementById('item-promo-type').value || null;
+    const actualPaid = parseFloat(document.getElementById('item-actual-paid').value) || null;
 
     if (!itemName || !price || !date) {
       this.showToast('请填写必填项', 'error');
@@ -471,7 +497,12 @@ const App = {
       totalPrice: price * quantity,
       channel,
       date,
-      notes
+      notes,
+      specQty,
+      specUnit,
+      isPromo: isPromo || undefined,
+      promoType,
+      actualPaid
     };
 
     if (id) {
