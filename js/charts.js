@@ -106,7 +106,7 @@ const Charts = {
       return;
     }
 
-    const radius = 72;
+    const radius = 68;
     const circumference = 2 * Math.PI * radius;
     let offset = 0;
     const segments = data.map((d, i) => {
