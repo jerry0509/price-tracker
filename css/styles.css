@@ -660,8 +660,7 @@ tr:last-child td { border-bottom: none; }
 .donut-container {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 32px;
+  gap: 24px;
   padding: 8px 0;
   width: 100%;
 }
@@ -726,8 +725,8 @@ tr:last-child td { border-bottom: none; }
 }
 
 .legend-label {
+  flex: 1;
   color: var(--text-secondary);
-  min-width: 70px;
 }
 
 .legend-value {
