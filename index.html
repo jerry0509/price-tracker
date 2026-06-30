@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PriceTracker</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="bg-glow"></div>
+
+  <div class="container">
+    <header class="header">
+      <div class="header-left">
+        <div class="logo">📊</div>
+        <div>
+          <h1>PriceTracker</h1>
+          <div class="header-subtitle">智能消费分析 · AI 驱动</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-primary" onclick="App.switchTab('ai')">
+          <span>🤖</span> AI 导入
+        </button>
+        <div style="position:relative">
+          <button class="btn" id="btn-export"><span>📥</span> 导出</button>
+          <div id="export-menu" class="export-menu" style="display:none">
+            <div class="menu-item" onclick="App.exportJSON()">📄 导出 JSON</div>
+            <div class="menu-item" onclick="App.exportCSV()">📊 导出记录 CSV</div>
+            <div class="menu-item" onclick="App.exportItemsCSV()">📦 导出汇总 CSV</div>
+            <div class="menu-divider"></div>
+            <div class="menu-item" onclick="App.loadDemoData()" style="color:var(--accent)">🔄 重置示例数据</div>
+            <div class="menu-item" onclick="App.deleteTestData()" style="color:var(--warning)">🗑️ 删除测试数据</div>
+            <div class="menu-item" onclick="App.deleteAllData()" style="color:var(--danger)">⚠️ 删除所有数据</div>
+          </div>
+        </div>
+        <button class="btn" id="btn-import"><span>📤</span> 导入</button>
+      </div>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="overview"><span class="tab-icon">📋</span> 价格总览</button>
+      <button class="tab" data-tab="records"><span class="tab-icon">🛒</span> 购买记录</button>
+      <button class="tab" data-tab="analysis"><span class="tab-icon">📈</span> 数据分析</button>
+      <button class="tab" data-tab="ai"><span class="tab-icon">🤖</span> AI 导入</button>
+    </nav>
+
+    <main id="tab-overview" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <button class="btn btn-primary" id="btn-add-purchase"><span>+</span> 添加记录</button>
+          <div class="filters">
+            <input class="input" id="search-overview" placeholder="🔍 搜索..." style="width:150px">
+            <select class="input" id="filter-category-overview"><option value="">全部分类</option></select>
+            <select class="input" id="filter-channel-overview"><option value="">全部渠道</option></select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th data-sort="name">物品名称 <span class="sort-arrow">↕</span></th>
+              <th data-sort="category">分类 <span class="sort-arrow">↕</span></th>
+              <th data-sort="maxPrice">最高价 <span class="sort-arrow">↕</span></th>
+              <th data-sort="minPrice">最低价 <span class="sort-arrow">↕</span></th>
+              <th data-sort="avgPrice">平均价 <span class="sort-arrow">↕</span></th>
+              <th>最便宜渠道</th>
+              <th data-sort="totalPurchases">次数 <span class="sort-arrow">↕</span></th>
+              <th data-sort="avgDuration">时长 <span class="sort-arrow">↕</span></th>
+              <th data-sort="dailyCost" class="sorted">日均 <span class="sort-arrow">↓</span></th>
+              <th>操作</th>
+            </tr></thead>
+            <tbody id="overview-tbody"></tbody>
+          </table>
+        </div>
+        <div id="overview-empty" class="empty" style="display:none">
+          <div class="empty-icon">📦</div>
+          <p>还没有购买记录</p>
+          <p class="empty-sub">点击「添加记录」或使用「AI 导入」开始</p>
+        </div>
+        <div id="overview-pagination" class="pagination" style="display:none">
+          <button class="btn btn-xs" onclick="App.goPage('overview', -1)">‹ 上一页</button>
+          <span id="overview-page-info" class="page-info">1 / 1</span>
+          <button class="btn btn-xs" onclick="App.goPage('overview', 1)">下一页 ›</button>
+        </div>
+        <div class="summary">
+          <span>共 <strong id="summary-total-items">0</strong> 类</span>
+          <span>总花费 <strong id="summary-total-spending">¥0</strong></span>
+          <span>均日均 <strong id="summary-avg-daily">¥0</strong></span>
+          <span>最高 <strong id="summary-max-daily">-</strong></span>
+          <span>最低 <strong id="summary-min-daily">-</strong></span>
+        </div>
+      </div>
+    </main>
+
+    <main id="tab-records" class="tab-content" style="display:none">
+      <div class="card">
+        <div class="card-header">
+          <button class="btn btn-primary" onclick="App.showPurchaseModal()"><span>+</span> 添加记录</button>
+          <div class="filters">
+            <input class="input" id="search-records" placeholder="🔍 搜索..." style="width:160px">
+            <select class="input" id="filter-category-records"><option value="">全部分类</option></select>
+            <select class="input" id="filter-channel"><option value="">全部渠道</option></select>
+            <input class="input" type="date" id="filter-date-from" style="width:130px">
+            <span style="color:var(--text-muted);font-size:12px;line-height:36px">至</span>
+            <input class="input" type="date" id="filter-date-to" style="width:130px">
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>日期</th><th>物品</th><th>分类</th><th>单价</th><th>数量</th><th>总价</th><th>渠道</th><th>备注</th><th>操作</th>
+            </tr></thead>
+            <tbody id="records-tbody"></tbody>
+          </table>
+        </div>
+        <div id="records-empty" class="empty" style="display:none">
+          <div class="empty-icon">🛒</div>
+          <p>没有记录</p>
+          <p class="empty-sub">调整筛选或添加新记录</p>
+        </div>
+        <div id="records-pagination" class="pagination" style="display:none">
+          <button class="btn btn-xs" onclick="App.goPage('records', -1)">‹ 上一页</button>
+          <span id="records-page-info" class="page-info">1 / 1</span>
+          <button class="btn btn-xs" onclick="App.goPage('records', 1)">下一页 ›</button>
+        </div>
+        <div class="summary">
+          <span>本月 <strong id="summary-month-spending">¥0</strong></span>
+          <span>本年 <strong id="summary-year-spending">¥0</strong></span>
+          <span>记录 <strong id="summary-records-count">0</strong></span>
+        </div>
+      </div>
+    </main>
+
+    <main id="tab-analysis" class="tab-content" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <div class="stat-cards" style="margin-bottom:0;flex:1">
+          <div class="stat-card">
+            <div class="stat-card-icon">💰</div>
+            <div class="stat-card-label">总消费</div>
+            <div class="stat-card-value" id="stat-total-spending">¥0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon">📅</div>
+            <div class="stat-card-label">本月消费</div>
+            <div class="stat-card-value" id="stat-month-spending">¥0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon">🛒</div>
+            <div class="stat-card-label">购买次数</div>
+            <div class="stat-card-value" id="stat-purchase-count">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon">📊</div>
+            <div class="stat-card-label">日均消费</div>
+            <div class="stat-card-value" id="stat-daily-spending">¥0</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-left:16px;flex-shrink:0">
+          <select class="input" id="chart-year" style="width:100px"></select>
+          <select class="input" id="chart-month" style="width:100px"></select>
+        </div>
+      </div>
+
+      <div class="charts-row" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+        <div class="chart-card">
+          <h3><span class="chart-icon">📦</span> 分类消费占比</h3>
+          <div id="chart-category"></div>
+        </div>
+        <div class="chart-card">
+          <h3><span class="chart-icon">🏪</span> 渠道消费占比</h3>
+          <div id="chart-channel"></div>
+        </div>
+      </div>
+
+      <div class="charts-row" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="chart-card">
+          <h3><span class="chart-icon">📈</span> <span id="monthly-title">月度消费趋势</span></h3>
+          <div id="chart-monthly" class="bar-chart"></div>
+        </div>
+        <div class="chart-card">
+          <h3><span class="chart-icon">💰</span> 日均成本排行</h3>
+          <div id="chart-daily-cost" class="bar-chart"></div>
+        </div>
+      </div>
+    </main>
+
+    <main id="tab-ai" class="tab-content" style="display:none">
+      <div class="ai-panel">
+        <div class="ai-panel-header">
+          <div class="ai-icon">🤖</div>
+          <div>
+            <div class="ai-panel-title">AI 智能导入</div>
+            <div class="ai-panel-desc">拍照识别小票，AI 自动解析为结构化数据</div>
+          </div>
+        </div>
+        <div class="ai-steps">
+          <div class="ai-step">
+            <div class="ai-step-num">1</div>
+            <div class="ai-step-title">复制模板</div>
+            <div class="ai-step-desc">点击下方按钮复制提示词模板</div>
+          </div>
+          <div class="ai-step">
+            <div class="ai-step-num">2</div>
+            <div class="ai-step-title">发送给 AI</div>
+            <div class="ai-step-desc">将模板和小票一起发给 AI</div>
+          </div>
+          <div class="ai-step">
+            <div class="ai-step-num">3</div>
+            <div class="ai-step-title">粘贴导入</div>
+            <div class="ai-step-desc">AI 返回 JSON 后粘贴导入</div>
+          </div>
+        </div>
+        <div class="ai-actions">
+          <button class="btn btn-primary" onclick="App.copyAITemplate()">📋 复制提示词模板</button>
+          <button class="btn" onclick="App.showTemplatePreview()">👁️ 预览模板</button>
+        </div>
+        <div id="template-preview" class="template-preview" style="display:none"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3 style="font-size:14px;font-weight:600">📥 粘贴 AI 返回的数据</h3>
+          <div class="filters">
+            <button class="btn btn-sm" onclick="App.pasteFromClipboard()">📋 粘贴</button>
+            <button class="btn btn-sm" onclick="App.formatImportJSON()">格式化</button>
+            <button class="btn btn-sm" onclick="App.validateImportJSON()">验证</button>
+            <button class="btn btn-sm btn-primary" onclick="App.importAIData()">✓ 导入</button>
+          </div>
+        </div>
+        <textarea class="import-area" id="ai-import-input" placeholder='粘贴 AI 返回的 JSON 数据...
+
+示例：
+[
+  {"itemName":"抽纸","category":"日用品","price":29.9,"quantity":10,"channel":"京东","date":"2026-06-30","notes":""}
+]'></textarea>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-overlay" id="modal-purchase">
+    <div class="modal">
+      <h2 id="modal-purchase-title">📝 添加购买记录</h2>
+      <form id="purchase-form">
+        <input type="hidden" id="item-id">
+        <div class="form-row">
+          <div class="form-group form-group-autocomplete">
+            <label>物品名称 <span class="required">*</span></label>
+            <input class="input" id="item-name" placeholder="输入物品名称" required autocomplete="off">
+            <div id="autocomplete-list" class="autocomplete-list" style="display:none"></div>
+          </div>
+          <div class="form-group">
+            <label>分类</label>
+            <input class="input" id="item-category" placeholder="输入或选择分类" list="category-list" autocomplete="off">
+            <datalist id="category-list"></datalist>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>单价 <span class="required">*</span></label>
+            <input class="input" type="number" id="item-price" placeholder="0.00" step="0.01" min="0.01" required>
+          </div>
+          <div class="form-group">
+            <label>数量</label>
+            <input class="input" type="number" id="item-quantity" value="1" min="1">
+          </div>
+          <div class="form-group">
+            <label>总价</label>
+            <input class="input" type="number" id="item-total" placeholder="自动计算" readonly style="opacity:0.5">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>渠道</label>
+            <input class="input" id="item-channel" placeholder="输入或选择渠道" list="channel-list" autocomplete="off">
+            <datalist id="channel-list"></datalist>
+          </div>
+          <div class="form-group">
+            <label>日期 <span class="required">*</span></label>
+            <input class="input" type="date" id="item-date" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>备注</label>
+            <input class="input" id="item-notes" placeholder="可选">
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn" onclick="App.closePurchaseModal()">取消</button>
+          <button type="submit" class="btn btn-primary">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-edit-item">
+    <div class="modal">
+      <h2>✏️ 编辑物品</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label>名称 <span class="required">*</span></label>
+          <input class="input" id="edit-item-name" required>
+        </div>
+        <div class="form-group">
+          <label>分类</label>
+          <input class="input" id="edit-item-category" list="category-list" autocomplete="off">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" onclick="App.closeEditItemModal()">取消</button>
+        <button class="btn btn-primary" onclick="App.saveEditItem()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      App.initFilters();
+      App.init();
+      Charts.init();
+    });
+  </script>
+</body>
+</html>
