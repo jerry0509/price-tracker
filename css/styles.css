@@ -663,6 +663,7 @@ tr:last-child td { border-bottom: none; }
   justify-content: center;
   gap: 32px;
   padding: 8px 0;
+  width: 100%;
 }
 
 .donut-chart {
@@ -726,7 +727,7 @@ tr:last-child td { border-bottom: none; }
 
 .legend-label {
   color: var(--text-secondary);
-  min-width: 50px;
+  min-width: 70px;
 }
 
 .legend-value {
