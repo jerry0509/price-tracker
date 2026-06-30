@@ -277,7 +277,7 @@ const Store = {
 
   exportCSV() {
     const purchases = this.getPurchases();
-    const headers = ['日期', '物品名称', '分类', '单价', '数量', '总价', '渠道', '备注'];
+    const headers = ['日期', '物品名称', '分类', '单价', '数量', '总价', '渠道', '规格数量', '规格单位', '是否促销', '促销方式', '实付金额', '备注'];
     const rows = purchases.map(p => [
       p.date,
       p.itemName,
@@ -286,6 +286,11 @@ const Store = {
       p.quantity,
       p.totalPrice,
       p.channel,
+      p.specQty || '',
+      p.specUnit || '',
+      p.isPromo ? '是' : '',
+      p.promoType || '',
+      p.actualPaid || '',
       p.notes || ''
     ]);
 
@@ -299,7 +304,7 @@ const Store = {
 
   exportItemsCSV() {
     const items = this.getItems();
-    const headers = ['物品名称', '分类', '最高价', '最低价', '平均价', '最便宜渠道', '购买次数', '平均时长(天)', '日均成本'];
+    const headers = ['物品名称', '分类', '最高价', '最低价', '平均价', '最便宜渠道', '购买次数', '平均时长(天)', '日均成本', '单位价格', '规格单位'];
     const rows = items.map(item => [
       item.name,
       item.category,
@@ -309,7 +314,9 @@ const Store = {
       item.cheapestChannel,
       item.totalPurchases,
       item.avgDuration ? item.avgDuration.toFixed(1) : '数据不足',
-      item.dailyCost ? item.dailyCost.toFixed(2) : 'N/A'
+      item.dailyCost ? item.dailyCost.toFixed(2) : 'N/A',
+      item.unitPrice !== null ? item.unitPrice.toFixed(4) : '',
+      item.specUnit || ''
     ]);
 
     const csvContent = [
@@ -362,7 +369,7 @@ const Store = {
 
     purchases.forEach(p => {
       const month = p.date.substring(0, 7);
-      monthly[month] = (monthly[month] || 0) + p.totalPrice;
+      monthly[month] = (monthly[month] || 0) + this.getEffectivePrice(p);
     });
 
     return monthly;
@@ -373,7 +380,7 @@ const Store = {
     const category = {};
 
     purchases.forEach(p => {
-      category[p.category] = (category[p.category] || 0) + p.totalPrice;
+      category[p.category] = (category[p.category] || 0) + this.getEffectivePrice(p);
     });
 
     return category;
@@ -384,7 +391,7 @@ const Store = {
     const channel = {};
 
     purchases.forEach(p => {
-      channel[p.channel] = (channel[p.channel] || 0) + p.totalPrice;
+      channel[p.channel] = (channel[p.channel] || 0) + this.getEffectivePrice(p);
     });
 
     return channel;
@@ -395,7 +402,7 @@ const Store = {
     const purchases = this.getPurchases();
     return purchases
       .filter(p => p.date.startsWith(currentMonth))
-      .reduce((sum, p) => sum + p.totalPrice, 0);
+      .reduce((sum, p) => sum + this.getEffectivePrice(p), 0);
   },
 
   getCurrentYearSpending() {
@@ -403,12 +410,16 @@ const Store = {
     const purchases = this.getPurchases();
     return purchases
       .filter(p => p.date.startsWith(currentYear))
-      .reduce((sum, p) => sum + p.totalPrice, 0);
+      .reduce((sum, p) => sum + this.getEffectivePrice(p), 0);
   },
 
   getTotalSpending() {
     const purchases = this.getPurchases();
-    return purchases.reduce((sum, p) => sum + p.totalPrice, 0);
+    return purchases.reduce((sum, p) => sum + this.getEffectivePrice(p), 0);
+  },
+
+  getEffectivePrice(p) {
+    return (p.isPromo && p.actualPaid) ? p.actualPaid : p.totalPrice;
   }
 };
 

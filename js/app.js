@@ -359,11 +359,11 @@ const App = {
 
     const monthSpending = purchases
       .filter(p => p.date.startsWith(currentMonth))
-      .reduce((sum, p) => sum + p.totalPrice, 0);
+      .reduce((sum, p) => sum + Store.getEffectivePrice(p), 0);
 
     const yearSpending = purchases
       .filter(p => p.date.startsWith(currentYear))
-      .reduce((sum, p) => sum + p.totalPrice, 0);
+      .reduce((sum, p) => sum + Store.getEffectivePrice(p), 0);
 
     document.getElementById('summary-month-spending').textContent = Utils.formatPrice(monthSpending);
     document.getElementById('summary-year-spending').textContent = Utils.formatPrice(yearSpending);
@@ -500,7 +500,7 @@ const App = {
       notes,
       specQty,
       specUnit,
-      isPromo: isPromo || undefined,
+      isPromo,
       promoType,
       actualPaid
     };
@@ -800,6 +800,11 @@ const App = {
    - channel: 购买渠道（从以下选项中选择：${channels.join('、')}）
    - date: 购买日期（格式 YYYY-MM-DD，如果小票没有日期则用今天）
    - notes: 备注（可选，如有特殊说明则填写）
+   - specQty: 规格数量（可选，如120抽、250ml、30枚等中的数字）
+   - specUnit: 规格单位（可选，如抽、ml、枚、g、kg、片、包、卷）
+   - isPromo: 是否促销（可选，true/false）
+   - promoType: 促销方式（可选，如买一送一、限时特价、满减等）
+   - actualPaid: 实付金额（可选，促销时实际支付的金额）
 
 2. 输出格式为 JSON 数组，例如：
 [
@@ -810,7 +815,12 @@ const App = {
     "quantity": 10,
     "channel": "京东",
     "date": "2026-06-30",
-    "notes": "618囤货"
+    "notes": "618囤货",
+    "specQty": 120,
+    "specUnit": "抽",
+    "isPromo": true,
+    "promoType": "满减",
+    "actualPaid": 269.1
   }
 ]
 
@@ -936,9 +946,11 @@ const App = {
     data.forEach(item => {
       if (!item.itemName || !item.price) return;
 
+      const existingItem = Store.getItemByName(item.itemName);
+
       const purchase = {
         id: Utils.generateId(),
-        itemId: Utils.generateId(),
+        itemId: existingItem ? existingItem.id : Utils.generateId(),
         itemName: item.itemName,
         category: categories.includes(item.category) ? item.category : '其他',
         price: parseFloat(item.price),
@@ -946,13 +958,13 @@ const App = {
         totalPrice: parseFloat(item.price) * (parseInt(item.quantity) || 1),
         channel: channels.includes(item.channel) ? item.channel : '其他',
         date: item.date || today,
-        notes: item.notes || ''
+        notes: item.notes || '',
+        specQty: parseInt(item.specQty) || null,
+        specUnit: item.specUnit || null,
+        isPromo: !!item.isPromo,
+        promoType: item.promoType || null,
+        actualPaid: parseFloat(item.actualPaid) || null
       };
-
-      const existingItem = Store.getItemByName(purchase.itemName);
-      if (existingItem) {
-        purchase.itemId = existingItem.id;
-      }
 
       Store.addPurchase(purchase);
       importedCount++;
