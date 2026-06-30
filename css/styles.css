@@ -725,8 +725,8 @@ tr:last-child td { border-bottom: none; }
 }
 
 .legend-label {
-  flex: 1;
   color: var(--text-secondary);
+  min-width: 70px;
 }
 
 .legend-value {
