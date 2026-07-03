@@ -7,43 +7,95 @@
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-  <div class="bg-grid"></div>
-  <div class="bg-glow"></div>
-
   <div class="container">
     <header class="header">
       <div class="header-left">
-        <div class="logo">📊</div>
+        <div class="logo">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 20V10"></path>
+            <path d="M18 20V4"></path>
+            <path d="M6 20v-6"></path>
+          </svg>
+        </div>
         <div>
           <h1>PriceTracker</h1>
-          <div class="header-subtitle">智能消费分析 · AI 驱动</div>
         </div>
       </div>
       <div class="header-actions">
         <button class="btn btn-primary" onclick="App.switchTab('ai')">
-          <span>🤖</span> AI 导入
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a4 4 0 0 1 4 4v1a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z"></path>
+            <path d="M16 11a4 4 0 0 1 0 8"></path>
+            <path d="M8 11a4 4 0 0 0 0 8"></path>
+            <path d="M12 11v8"></path>
+          </svg>
+          AI 导入
         </button>
         <div style="position:relative">
-          <button class="btn" id="btn-export"><span>📥</span> 导出</button>
+          <button class="btn" id="btn-export">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            导出
+          </button>
           <div id="export-menu" class="export-menu" style="display:none">
-            <div class="menu-item" onclick="App.exportJSON()">📄 导出 JSON</div>
-            <div class="menu-item" onclick="App.exportCSV()">📊 导出记录 CSV</div>
-            <div class="menu-item" onclick="App.exportItemsCSV()">📦 导出汇总 CSV</div>
+            <div class="menu-item" onclick="App.exportJSON()">导出 JSON</div>
+            <div class="menu-item" onclick="App.exportCSV()">导出记录 CSV</div>
+            <div class="menu-item" onclick="App.exportItemsCSV()">导出汇总 CSV</div>
             <div class="menu-divider"></div>
-            <div class="menu-item" onclick="App.loadDemoData()" style="color:var(--accent)">🔄 重置示例数据</div>
-            <div class="menu-item" onclick="App.deleteTestData()" style="color:var(--warning)">🗑️ 删除测试数据</div>
-            <div class="menu-item" onclick="App.deleteAllData()" style="color:var(--danger)">⚠️ 删除所有数据</div>
+            <div class="menu-item" onclick="App.loadDemoData()" style="color:var(--accent)">重置示例数据</div>
+            <div class="menu-item" onclick="App.deleteTestData()" style="color:var(--warning)">删除测试数据</div>
+            <div class="menu-item" onclick="App.deleteAllData()" style="color:var(--danger)">删除所有数据</div>
           </div>
         </div>
-        <button class="btn" id="btn-import"><span>📤</span> 导入</button>
+        <button class="btn" id="btn-import">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+          导入
+        </button>
       </div>
     </header>
 
     <nav class="tabs">
-      <button class="tab active" data-tab="overview"><span class="tab-icon">📋</span> 价格总览</button>
-      <button class="tab" data-tab="records"><span class="tab-icon">🛒</span> 购买记录</button>
-      <button class="tab" data-tab="analysis"><span class="tab-icon">📈</span> 数据分析</button>
-      <button class="tab" data-tab="ai"><span class="tab-icon">🤖</span> AI 导入</button>
+      <button class="tab active" data-tab="overview">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7"></rect>
+          <rect x="14" y="3" width="7" height="7"></rect>
+          <rect x="14" y="14" width="7" height="7"></rect>
+          <rect x="3" y="14" width="7" height="7"></rect>
+        </svg>
+        价格总览
+      </button>
+      <button class="tab" data-tab="records">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <path d="M16 10a4 4 0 0 1-8 0"></path>
+        </svg>
+        购买记录
+      </button>
+      <button class="tab" data-tab="analysis">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="20" x2="18" y2="10"></line>
+          <line x1="12" y1="20" x2="12" y2="4"></line>
+          <line x1="6" y1="20" x2="6" y2="14"></line>
+        </svg>
+        数据分析
+      </button>
+      <button class="tab" data-tab="ai">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2a4 4 0 0 1 4 4v1a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z"></path>
+          <path d="M16 11a4 4 0 0 1 0 8"></path>
+          <path d="M8 11a4 4 0 0 0 0 8"></path>
+          <path d="M12 11v8"></path>
+        </svg>
+        AI 导入
+      </button>
     </nav>
 
     <main id="tab-overview" class="tab-content">
@@ -51,7 +103,7 @@
         <div class="card-header">
           <button class="btn btn-primary" id="btn-add-purchase"><span>+</span> 添加记录</button>
           <div class="filters">
-            <input class="input" id="search-overview" placeholder="🔍 搜索..." style="width:150px">
+            <input class="input" id="search-overview" placeholder="搜索..." style="width:150px">
             <select class="input" id="filter-category-overview"><option value="">全部分类</option></select>
             <select class="input" id="filter-channel-overview"><option value="">全部渠道</option></select>
           </div>
@@ -81,7 +133,13 @@
           </table>
         </div>
         <div id="overview-empty" class="empty" style="display:none">
-          <div class="empty-icon">📦</div>
+          <div class="empty-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <path d="M16 10a4 4 0 0 1-8 0"></path>
+            </svg>
+          </div>
           <p>还没有购买记录</p>
           <p class="empty-sub">点击「添加记录」或使用「AI 导入」开始</p>
         </div>
@@ -107,7 +165,7 @@
         <div class="card-header">
           <button class="btn btn-primary" onclick="App.showPurchaseModal()"><span>+</span> 添加记录</button>
           <div class="filters">
-            <input class="input" id="search-records" placeholder="🔍 搜索..." style="width:160px">
+            <input class="input" id="search-records" placeholder="搜索..." style="width:160px">
             <select class="input" id="filter-category-records"><option value="">全部分类</option></select>
             <select class="input" id="filter-channel"><option value="">全部渠道</option></select>
             <input class="input" type="date" id="filter-date-from" style="width:130px">
@@ -129,7 +187,12 @@
           </table>
         </div>
         <div id="records-empty" class="empty" style="display:none">
-          <div class="empty-icon">🛒</div>
+          <div class="empty-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M8 12h8"></path>
+            </svg>
+          </div>
           <p>没有记录</p>
           <p class="empty-sub">调整筛选或添加新记录</p>
         </div>
@@ -149,53 +212,74 @@
     </main>
 
     <main id="tab-analysis" class="tab-content" style="display:none">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-        <div class="stat-cards" style="margin-bottom:0;flex:1">
-          <div class="stat-card">
-            <div class="stat-card-icon">💰</div>
-            <div class="stat-card-label">总消费</div>
-            <div class="stat-card-value" id="stat-total-spending">¥0</div>
+      <div class="stat-cards" style="margin-bottom:20px">
+        <div class="stat-card">
+          <div class="stat-card-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="1" x2="12" y2="23"></line>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
           </div>
-          <div class="stat-card">
-            <div class="stat-card-icon">📅</div>
-            <div class="stat-card-label">本月消费</div>
-            <div class="stat-card-value" id="stat-month-spending">¥0</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-card-icon">🛒</div>
-            <div class="stat-card-label">购买次数</div>
-            <div class="stat-card-value" id="stat-purchase-count">0</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-card-icon">📊</div>
-            <div class="stat-card-label">日均消费</div>
-            <div class="stat-card-value" id="stat-daily-spending">¥0</div>
-          </div>
+          <div class="stat-card-label">总消费</div>
+          <div class="stat-card-value" id="stat-total-spending">¥0</div>
         </div>
-        <div style="display:flex;gap:8px;margin-left:16px;flex-shrink:0">
-          <select class="input" id="chart-year" style="width:100px"></select>
-          <select class="input" id="chart-month" style="width:100px"></select>
+        <div class="stat-card">
+          <div class="stat-card-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+          </div>
+          <div class="stat-card-label">本月消费</div>
+          <div class="stat-card-value" id="stat-month-spending">¥0</div>
         </div>
+        <div class="stat-card">
+          <div class="stat-card-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <path d="M16 10a4 4 0 0 1-8 0"></path>
+            </svg>
+          </div>
+          <div class="stat-card-label">购买次数</div>
+          <div class="stat-card-value" id="stat-purchase-count">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+            </svg>
+          </div>
+          <div class="stat-card-label">日均消费</div>
+          <div class="stat-card-value" id="stat-daily-spending">¥0</div>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:16px">
+        <select class="input" id="chart-year" style="width:100px"></select>
+        <select class="input" id="chart-month" style="width:100px"></select>
       </div>
 
       <div class="charts-row" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
         <div class="chart-card">
-          <h3><span class="chart-icon">📦</span> 分类消费占比</h3>
+          <h3>分类消费占比</h3>
           <div id="chart-category" class="chart-card-scroll"></div>
         </div>
         <div class="chart-card">
-          <h3><span class="chart-icon">🏪</span> 渠道消费占比</h3>
+          <h3>渠道消费占比</h3>
           <div id="chart-channel" class="chart-card-scroll"></div>
         </div>
       </div>
 
       <div class="charts-row" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
         <div class="chart-card">
-          <h3><span class="chart-icon">📈</span> <span id="monthly-title">月度消费趋势</span></h3>
+          <h3><span id="monthly-title">月度消费趋势</span></h3>
           <div id="chart-monthly" class="bar-chart"></div>
          </div>
          <div class="chart-card">
-           <h3><span class="chart-icon">💰</span> 日均成本排行</h3>
+           <h3>日均成本排行</h3>
            <div id="chart-daily-cost" class="bar-chart chart-card-scroll"></div>
         </div>
       </div>
@@ -204,7 +288,14 @@
     <main id="tab-ai" class="tab-content" style="display:none">
       <div class="ai-panel">
         <div class="ai-panel-header">
-          <div class="ai-icon">🤖</div>
+          <div class="ai-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a4 4 0 0 1 4 4v1a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z"></path>
+              <path d="M16 11a4 4 0 0 1 0 8"></path>
+              <path d="M8 11a4 4 0 0 0 0 8"></path>
+              <path d="M12 11v8"></path>
+            </svg>
+          </div>
           <div>
             <div class="ai-panel-title">AI 智能导入</div>
             <div class="ai-panel-desc">拍照识别小票，AI 自动解析为结构化数据</div>
@@ -228,20 +319,20 @@
           </div>
         </div>
         <div class="ai-actions">
-          <button class="btn btn-primary" onclick="App.copyAITemplate()">📋 复制提示词模板</button>
-          <button class="btn" onclick="App.showTemplatePreview()">👁️ 预览模板</button>
+          <button class="btn btn-primary" onclick="App.copyAITemplate()">复制提示词模板</button>
+          <button class="btn" onclick="App.showTemplatePreview()">预览模板</button>
         </div>
         <div id="template-preview" class="template-preview" style="display:none"></div>
       </div>
 
       <div class="card">
         <div class="card-header">
-          <h3 style="font-size:14px;font-weight:600">📥 粘贴 AI 返回的数据</h3>
+          <h3 style="font-size:14px;font-weight:600">粘贴 AI 返回的数据</h3>
           <div class="filters">
-            <button class="btn btn-sm" onclick="App.pasteFromClipboard()">📋 粘贴</button>
+            <button class="btn btn-sm" onclick="App.pasteFromClipboard()">粘贴</button>
             <button class="btn btn-sm" onclick="App.formatImportJSON()">格式化</button>
             <button class="btn btn-sm" onclick="App.validateImportJSON()">验证</button>
-            <button class="btn btn-sm btn-primary" onclick="App.importAIData()">✓ 导入</button>
+            <button class="btn btn-sm btn-primary" onclick="App.importAIData()">导入</button>
           </div>
         </div>
         <textarea class="import-area" id="ai-import-input" placeholder='粘贴 AI 返回的 JSON 数据...
@@ -256,7 +347,7 @@
 
   <div class="modal-overlay" id="modal-purchase">
     <div class="modal">
-      <h2 id="modal-purchase-title">📝 添加购买记录</h2>
+      <h2 id="modal-purchase-title">添加购买记录</h2>
       <form id="purchase-form">
         <input type="hidden" id="item-id">
         <div class="form-row">
@@ -313,7 +404,7 @@
           </div>
           <div class="form-group" style="flex:0 0 auto;display:flex;align-items:end;gap:8px">
             <label style="display:flex;align-items:center;gap:6px;cursor:pointer;margin-bottom:8px">
-              <input type="checkbox" id="item-is-promo" style="accent-color:var(--warning)"> 🏷️ 促销
+              <input type="checkbox" id="item-is-promo" style="accent-color:var(--warning)"> 促销
             </label>
           </div>
         </div>
@@ -352,7 +443,7 @@
 
   <div class="modal-overlay" id="modal-edit-item">
     <div class="modal">
-      <h2>✏️ 编辑物品</h2>
+      <h2>编辑物品</h2>
       <div class="form-row">
         <div class="form-group">
           <label>名称 <span class="required">*</span></label>
@@ -370,18 +461,55 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="modal-item-history">
+    <div class="modal modal-wide">
+      <h2 id="history-title">购买历史</h2>
+      
+      <div class="history-summary">
+        <div class="history-stat">
+          <span class="history-stat-label">分类</span>
+          <span class="history-stat-value"><span class="tag" id="history-category"></span></span>
+        </div>
+        <div class="history-stat">
+          <span class="history-stat-label">总购买</span>
+          <span class="history-stat-value" id="history-count"></span>
+        </div>
+        <div class="history-stat">
+          <span class="history-stat-label">价格区间</span>
+          <span class="history-stat-value price" id="history-price-range"></span>
+        </div>
+        <div class="history-stat">
+          <span class="history-stat-label">均价</span>
+          <span class="history-stat-value price" id="history-avg-price"></span>
+        </div>
+      </div>
+
+      <div class="history-table-wrap">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>日期</th>
+              <th>单价</th>
+              <th>数量</th>
+              <th>总价</th>
+              <th>渠道</th>
+              <th>规格</th>
+              <th>促销</th>
+              <th>备注</th>
+            </tr>
+          </thead>
+          <tbody id="history-tbody"></tbody>
+        </table>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn" onclick="App.closeItemHistoryModal()">关闭</button>
+      </div>
+    </div>
+  </div>
+
   <div id="toast-container"></div>
 
-  <script src="js/utils.js"></script>
-  <script src="js/store.js"></script>
-  <script src="js/charts.js"></script>
-  <script src="js/app.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      App.initFilters();
-      App.init();
-      Charts.init();
-    });
-  </script>
+  <script type="module" src="js/app.js"></script>
 </body>
 </html>
