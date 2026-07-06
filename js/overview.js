@@ -64,10 +64,20 @@ export function render(filters = {}) {
 
   if (emptyState) emptyState.style.display = 'none';
 
-  tbody.innerHTML = items.map(item => `
+  tbody.innerHTML = items.map(item => {
+    // 品牌显示逻辑
+    let brandHtml = '';
+    if (item.brandCount === 1) {
+      brandHtml = `<span class="brand-tag" title="${escapeHtml(item.mainBrand)}">${escapeHtml(item.mainBrand)}</span>`;
+    } else if (item.brandCount > 1) {
+      brandHtml = `<span class="brand-tag brand-multi" title="${escapeHtml(item.brands.join('、'))}">${item.brandCount}品牌</span>`;
+    }
+
+    return `
     <tr>
       <td>
         <strong class="item-name-link" onclick="App.showItemHistory('${item.id}')" title="查看购买历史">${escapeHtml(item.name)}</strong>
+        ${brandHtml}
         ${item.specUnit ? `<span class="spec-tag">${item.specUnit}</span>` : ''}
       </td>
       <td><span class="tag">${escapeHtml(item.category)}</span></td>
@@ -91,7 +101,8 @@ export function render(filters = {}) {
         </div>
       </td>
     </tr>
-  `).join('');
+    `;
+  }).join('');
 
   updateOverviewSummary(allItems);
 }
@@ -108,7 +119,8 @@ function getFilteredItems(filters) {
     const search = filters.search.toLowerCase();
     items = items.filter(item =>
       item.name.toLowerCase().includes(search) ||
-      item.category.toLowerCase().includes(search)
+      item.category.toLowerCase().includes(search) ||
+      (item.brands && item.brands.some(b => b.toLowerCase().includes(search)))
     );
   }
 
@@ -276,6 +288,7 @@ export function showItemHistory(itemId) {
       return `
         <tr>
           <td>${p.date}</td>
+          <td>${p.brand ? escapeHtml(p.brand) : '-'}</td>
           <td class="price">${formatPrice(p.price)}${trendHtml}</td>
           <td>${p.quantity}</td>
           <td class="price">${formatPrice(p.totalPrice)}</td>

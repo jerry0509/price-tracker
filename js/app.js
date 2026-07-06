@@ -40,6 +40,7 @@ function init() {
 function initModules() {
   Overview.init();
   Records.init();
+  Records.initRatingStars();
   Analysis.init();
   AiImport.init();
 }
@@ -237,6 +238,9 @@ function initFilters() {
         `<option value="${Utils.escapeHtml(ch)}" ${ch === current ? 'selected' : ''}>${Utils.escapeHtml(ch)}</option>`
       ).join('');
   });
+
+  // 初始化品牌选择器
+  Records.updateBrandSelect();
 }
 
 /**

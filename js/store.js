@@ -10,86 +10,86 @@ const STORAGE_KEY = 'price-tracker-data';
 const CATEGORIES_KEY = 'price-tracker-categories';
 const CHANNELS_KEY = 'price-tracker-channels';
 const VERSION_KEY = 'price-tracker-version';
-const CURRENT_VERSION = '3.4';
+const CURRENT_VERSION = '3.8';
 
-const defaultCategories = ['日用品', '蔬菜', '水果', '肉类', '零食', '饮料', '个护', '电子', '其他'];
+const defaultCategories = ['日用个护', '柴米油盐', '零食饮料', '科技电子', '其他'];
 const defaultChannels = ['京东', '淘宝', '拼多多', '大润发', '盒马', '山姆', '永辉', '美团', '菜市场', '超市', '超盒算', '其他'];
 
 const defaultPurchases = [
-  { id: 'd01', itemId: 'item-tissue', itemName: '抽纸', category: '日用品', price: 35, quantity: 10, totalPrice: 350, channel: '京东', date: '2026-01-08', notes: '年货节', specQty: 120, specUnit: '抽', isPromo: true, promoType: '满减', actualPaid: 320 },
-  { id: 'd02', itemId: 'item-tissue', itemName: '抽纸', category: '日用品', price: 28, quantity: 5, totalPrice: 140, channel: '拼多多', date: '2026-02-15', notes: '', specQty: 110, specUnit: '抽' },
-  { id: 'd03', itemId: 'item-tissue', itemName: '抽纸', category: '日用品', price: 32, quantity: 8, totalPrice: 256, channel: '大润发', date: '2026-04-20', notes: '特价', specQty: 130, specUnit: '抽', isPromo: true, promoType: '买一送一', actualPaid: 128 },
-  { id: 'd04', itemId: 'item-tissue', itemName: '抽纸', category: '日用品', price: 30, quantity: 6, totalPrice: 180, channel: '盒马', date: '2026-06-10', notes: '', specQty: 120, specUnit: '抽' },
-  { id: 'd05', itemId: 'item-shampoo', itemName: '洗发水', category: '个护', price: 49, quantity: 2, totalPrice: 98, channel: '京东', date: '2026-01-20', notes: '' },
-  { id: 'd06', itemId: 'item-shampoo', itemName: '洗发水', category: '个护', price: 45, quantity: 1, totalPrice: 45, channel: '山姆', date: '2026-04-05', notes: '大瓶装' },
-  { id: 'd07', itemId: 'item-shampoo', itemName: '洗发水', category: '个护', price: 52, quantity: 2, totalPrice: 104, channel: '盒马', date: '2026-06-25', notes: '' },
-  { id: 'd08', itemId: 'item-detergent', itemName: '洗衣液', category: '日用品', price: 39, quantity: 2, totalPrice: 78, channel: '拼多多', date: '2026-01-12', notes: '' },
-  { id: 'd09', itemId: 'item-detergent', itemName: '洗衣液', category: '日用品', price: 45, quantity: 1, totalPrice: 45, channel: '大润发', date: '2026-03-18', notes: '蓝月亮' },
-  { id: 'd10', itemId: 'item-detergent', itemName: '洗衣液', category: '日用品', price: 42, quantity: 2, totalPrice: 84, channel: '山姆', date: '2026-05-22', notes: '' },
-  { id: 'd11', itemId: 'item-rice', itemName: '大米', category: '食品', price: 59, quantity: 1, totalPrice: 59, channel: '山姆', date: '2026-01-25', notes: '5kg装' },
-  { id: 'd12', itemId: 'item-rice', itemName: '大米', category: '食品', price: 65, quantity: 1, totalPrice: 65, channel: '盒马', date: '2026-03-30', notes: '东北大米' },
-  { id: 'd13', itemId: 'item-rice', itemName: '大米', category: '食品', price: 55, quantity: 1, totalPrice: 55, channel: '大润发', date: '2026-06-05', notes: '' },
-  { id: 'd14', itemId: 'item-eggs', itemName: '鸡蛋', category: '食品', price: 18, quantity: 2, totalPrice: 36, channel: '盒马', date: '2026-01-10', notes: '', specQty: 10, specUnit: '枚' },
-  { id: 'd15', itemId: 'item-eggs', itemName: '鸡蛋', category: '食品', price: 15, quantity: 2, totalPrice: 30, channel: '永辉', date: '2026-02-20', notes: '30枚装', specQty: 30, specUnit: '枚' },
-  { id: 'd16', itemId: 'item-eggs', itemName: '鸡蛋', category: '食品', price: 20, quantity: 1, totalPrice: 20, channel: '美团', date: '2026-04-12', notes: '', specQty: 10, specUnit: '枚' },
-  { id: 'd17', itemId: 'item-eggs', itemName: '鸡蛋', category: '食品', price: 16, quantity: 2, totalPrice: 32, channel: '大润发', date: '2026-06-18', notes: '', specQty: 12, specUnit: '枚' },
-  { id: 'd18', itemId: 'item-milk', itemName: '牛奶', category: '饮料', price: 55, quantity: 2, totalPrice: 110, channel: '山姆', date: '2026-01-05', notes: '鲜奶', specQty: 1000, specUnit: 'ml' },
-  { id: 'd19', itemId: 'item-milk', itemName: '牛奶', category: '饮料', price: 49, quantity: 2, totalPrice: 98, channel: '盒马', date: '2026-03-08', notes: '', specQty: 950, specUnit: 'ml' },
-  { id: 'd20', itemId: 'item-milk', itemName: '牛奶', category: '饮料', price: 58, quantity: 1, totalPrice: 58, channel: '山姆', date: '2026-05-15', notes: '', specQty: 1000, specUnit: 'ml' },
-  { id: 'd21', itemId: 'item-milk', itemName: '牛奶', category: '饮料', price: 52, quantity: 2, totalPrice: 104, channel: '美团', date: '2026-06-28', notes: '', specQty: 250, specUnit: 'ml' },
-  { id: 'd22', itemId: 'item-apple', itemName: '苹果', category: '水果', price: 35, quantity: 1, totalPrice: 35, channel: '盒马', date: '2026-01-18', notes: '红富士' },
-  { id: 'd23', itemId: 'item-apple', itemName: '苹果', category: '水果', price: 28, quantity: 2, totalPrice: 56, channel: '美团', date: '2026-03-22', notes: '' },
-  { id: 'd24', itemId: 'item-apple', itemName: '苹果', category: '水果', price: 32, quantity: 1, totalPrice: 32, channel: '永辉', date: '2026-05-10', notes: '' },
-  { id: 'd25', itemId: 'item-banana', itemName: '香蕉', category: '水果', price: 12, quantity: 2, totalPrice: 24, channel: '美团', date: '2026-02-05', notes: '' },
-  { id: 'd26', itemId: 'item-banana', itemName: '香蕉', category: '水果', price: 15, quantity: 1, totalPrice: 15, channel: '盒马', date: '2026-04-18', notes: '' },
-  { id: 'd27', itemId: 'item-banana', itemName: '香蕉', category: '水果', price: 10, quantity: 3, totalPrice: 30, channel: '大润发', date: '2026-06-22', notes: '特价' },
-  { id: 'd28', itemId: 'item-pork', itemName: '猪肉', category: '肉类', price: 25, quantity: 2, totalPrice: 50, channel: '永辉', date: '2026-01-22', notes: '五花肉' },
-  { id: 'd29', itemId: 'item-pork', itemName: '猪肉', category: '肉类', price: 22, quantity: 2, totalPrice: 44, channel: '美团', date: '2026-03-15', notes: '' },
-  { id: 'd30', itemId: 'item-pork', itemName: '猪肉', category: '肉类', price: 28, quantity: 1, totalPrice: 28, channel: '山姆', date: '2026-05-28', notes: '黑猪肉' },
-  { id: 'd31', itemId: 'item-chicken', itemName: '鸡胸肉', category: '肉类', price: 18, quantity: 3, totalPrice: 54, channel: '山姆', date: '2026-02-12', notes: '' },
-  { id: 'd32', itemId: 'item-chicken', itemName: '鸡胸肉', category: '肉类', price: 15, quantity: 2, totalPrice: 30, channel: '美团', date: '2026-04-25', notes: '' },
-  { id: 'd33', itemId: 'item-chicken', itemName: '鸡胸肉', category: '肉类', price: 20, quantity: 2, totalPrice: 40, channel: '盒马', date: '2026-06-15', notes: '' },
-  { id: 'd34', itemId: 'item-tomato', itemName: '西红柿', category: '蔬菜', price: 8, quantity: 2, totalPrice: 16, channel: '美团', date: '2026-01-28', notes: '' },
-  { id: 'd35', itemId: 'item-tomato', itemName: '西红柿', category: '蔬菜', price: 6, quantity: 3, totalPrice: 18, channel: '永辉', date: '2026-03-25', notes: '' },
-  { id: 'd36', itemId: 'item-tomato', itemName: '西红柿', category: '蔬菜', price: 10, quantity: 2, totalPrice: 20, channel: '盒马', date: '2026-06-08', notes: '' },
-  { id: 'd37', itemId: 'item-broccoli', itemName: '西兰花', category: '蔬菜', price: 12, quantity: 2, totalPrice: 24, channel: '盒马', date: '2026-02-08', notes: '' },
-  { id: 'd38', itemId: 'item-broccoli', itemName: '西兰花', category: '蔬菜', price: 8, quantity: 2, totalPrice: 16, channel: '美团', date: '2026-04-30', notes: '' },
-  { id: 'd39', itemId: 'item-broccoli', itemName: '西兰花', category: '蔬菜', price: 10, quantity: 1, totalPrice: 10, channel: '大润发', date: '2026-06-20', notes: '' },
-  { id: 'd40', itemId: 'item-chips', itemName: '薯片', category: '零食', price: 12, quantity: 3, totalPrice: 36, channel: '拼多多', date: '2026-01-30', notes: '' },
-  { id: 'd41', itemId: 'item-chips', itemName: '薯片', category: '零食', price: 15, quantity: 2, totalPrice: 30, channel: '京东', date: '2026-04-08', notes: '' },
-  { id: 'd42', itemId: 'item-chips', itemName: '薯片', category: '零食', price: 10, quantity: 4, totalPrice: 40, channel: '大润发', date: '2026-06-12', notes: '促销' },
-  { id: 'd43', itemId: 'item-earphone', itemName: '蓝牙耳机', category: '电子', price: 299, quantity: 1, totalPrice: 299, channel: '淘宝', date: '2025-12-01', notes: '降噪款' },
-  { id: 'd44', itemId: 'item-earphone', itemName: '蓝牙耳机', category: '电子', price: 199, quantity: 1, totalPrice: 199, channel: '京东', date: '2026-05-20', notes: '备用' },
-  { id: 'd45', itemId: 'item-cable', itemName: '数据线', category: '电子', price: 15, quantity: 3, totalPrice: 45, channel: '拼多多', date: '2026-02-25', notes: 'Type-C' },
-  { id: 'd46', itemId: 'item-cable', itemName: '数据线', category: '电子', price: 12, quantity: 2, totalPrice: 24, channel: '淘宝', date: '2026-05-05', notes: '' },
-  { id: 'd47', itemId: 'item-toothpaste', itemName: '牙膏', category: '个护', price: 15, quantity: 2, totalPrice: 30, channel: '大润发', date: '2026-01-15', notes: '' },
-  { id: 'd48', itemId: 'item-toothpaste', itemName: '牙膏', category: '个护', price: 12, quantity: 3, totalPrice: 36, channel: '山姆', date: '2026-04-15', notes: '套装' },
-  { id: 'd49', itemId: 'item-water', itemName: '矿泉水', category: '饮料', price: 2, quantity: 12, totalPrice: 24, channel: '美团', date: '2026-03-05', notes: '' },
-  { id: 'd50', itemId: 'item-water', itemName: '矿泉水', category: '饮料', price: 2, quantity: 24, totalPrice: 48, channel: '山姆', date: '2026-06-01', notes: '整箱' },
-  { id: 'd51', itemId: 'item-tissue', itemName: '抽纸', category: '日用品', price: 28, quantity: 8, totalPrice: 224, channel: '京东', date: '2026-07-01', notes: '618返场', specQty: 120, specUnit: '抽', isPromo: true, promoType: '满减', actualPaid: 199 },
-  { id: 'd52', itemId: 'item-milk', itemName: '牛奶', category: '饮料', price: 55, quantity: 2, totalPrice: 110, channel: '山姆', date: '2026-07-02', notes: '', specQty: 1000, specUnit: 'ml' },
-  { id: 'd53', itemId: 'item-eggs', itemName: '鸡蛋', category: '食品', price: 18, quantity: 2, totalPrice: 36, channel: '盒马', date: '2026-07-03', notes: '', specQty: 10, specUnit: '枚' },
+  { id: 'd01', itemId: 'item-tissue', itemName: '抽纸', category: '日用个护', price: 35, quantity: 10, totalPrice: 350, channel: '京东', date: '2026-01-08', notes: '年货节', specQty: 120, specUnit: '抽', isPromo: true, promoType: '满减', actualPaid: 320, rating: 5, brand: '维达' },
+  { id: 'd02', itemId: 'item-tissue', itemName: '抽纸', category: '日用个护', price: 28, quantity: 5, totalPrice: 140, channel: '拼多多', date: '2026-02-15', notes: '', specQty: 110, specUnit: '抽', rating: 3, brand: '清风' },
+  { id: 'd03', itemId: 'item-tissue', itemName: '抽纸', category: '日用个护', price: 32, quantity: 8, totalPrice: 256, channel: '大润发', date: '2026-04-20', notes: '特价', specQty: 130, specUnit: '抽', isPromo: true, promoType: '买一送一', actualPaid: 128, rating: 4, brand: '心相印' },
+  { id: 'd04', itemId: 'item-tissue', itemName: '抽纸', category: '日用个护', price: 30, quantity: 6, totalPrice: 180, channel: '盒马', date: '2026-06-10', notes: '', specQty: 120, specUnit: '抽', rating: 4, brand: '维达' },
+  { id: 'd05', itemId: 'item-shampoo', itemName: '洗发水', category: '日用个护', price: 49, quantity: 2, totalPrice: 98, channel: '京东', date: '2026-01-20', notes: '', rating: 4, brand: '海飞丝' },
+  { id: 'd06', itemId: 'item-shampoo', itemName: '洗发水', category: '日用个护', price: 45, quantity: 1, totalPrice: 45, channel: '山姆', date: '2026-04-05', notes: '大瓶装', rating: 5, brand: '潘婷' },
+  { id: 'd07', itemId: 'item-shampoo', itemName: '洗发水', category: '日用个护', price: 52, quantity: 2, totalPrice: 104, channel: '盒马', date: '2026-06-25', notes: '', rating: 3, brand: '海飞丝' },
+  { id: 'd08', itemId: 'item-detergent', itemName: '洗衣液', category: '日用个护', price: 39, quantity: 2, totalPrice: 78, channel: '拼多多', date: '2026-01-12', notes: '', rating: 4, brand: '立白' },
+  { id: 'd09', itemId: 'item-detergent', itemName: '洗衣液', category: '日用个护', price: 45, quantity: 1, totalPrice: 45, channel: '大润发', date: '2026-03-18', notes: '', rating: 3, brand: '蓝月亮' },
+  { id: 'd10', itemId: 'item-detergent', itemName: '洗衣液', category: '日用个护', price: 42, quantity: 2, totalPrice: 84, channel: '山姆', date: '2026-05-22', notes: '', rating: 5, brand: '奥妙' },
+  { id: 'd11', itemId: 'item-rice', itemName: '大米', category: '柴米油盐', price: 59, quantity: 1, totalPrice: 59, channel: '山姆', date: '2026-01-25', notes: '5kg装', rating: 5, brand: '福临门' },
+  { id: 'd12', itemId: 'item-rice', itemName: '大米', category: '柴米油盐', price: 65, quantity: 1, totalPrice: 65, channel: '盒马', date: '2026-03-30', notes: '东北大米', rating: 4, brand: '金龙鱼' },
+  { id: 'd13', itemId: 'item-rice', itemName: '大米', category: '柴米油盐', price: 55, quantity: 1, totalPrice: 55, channel: '大润发', date: '2026-06-05', notes: '', rating: 3, brand: '福临门' },
+  { id: 'd14', itemId: 'item-eggs', itemName: '鸡蛋', category: '柴米油盐', price: 18, quantity: 2, totalPrice: 36, channel: '盒马', date: '2026-01-10', notes: '', specQty: 10, specUnit: '枚', rating: 4, brand: '' },
+  { id: 'd15', itemId: 'item-eggs', itemName: '鸡蛋', category: '柴米油盐', price: 15, quantity: 2, totalPrice: 30, channel: '永辉', date: '2026-02-20', notes: '30枚装', specQty: 30, specUnit: '枚', rating: 5, brand: '' },
+  { id: 'd16', itemId: 'item-eggs', itemName: '鸡蛋', category: '柴米油盐', price: 20, quantity: 1, totalPrice: 20, channel: '美团', date: '2026-04-12', notes: '', specQty: 10, specUnit: '枚', rating: 3, brand: '' },
+  { id: 'd17', itemId: 'item-eggs', itemName: '鸡蛋', category: '柴米油盐', price: 16, quantity: 2, totalPrice: 32, channel: '大润发', date: '2026-06-18', notes: '', specQty: 12, specUnit: '枚', rating: 4, brand: '' },
+  { id: 'd18', itemId: 'item-milk', itemName: '牛奶', category: '零食饮料', price: 55, quantity: 2, totalPrice: 110, channel: '山姆', date: '2026-01-05', notes: '鲜奶', specQty: 1000, specUnit: 'ml', rating: 5, brand: '蒙牛' },
+  { id: 'd19', itemId: 'item-milk', itemName: '牛奶', category: '零食饮料', price: 49, quantity: 2, totalPrice: 98, channel: '盒马', date: '2026-03-08', notes: '', specQty: 950, specUnit: 'ml', rating: 4, brand: '伊利' },
+  { id: 'd20', itemId: 'item-milk', itemName: '牛奶', category: '零食饮料', price: 58, quantity: 1, totalPrice: 58, channel: '山姆', date: '2026-05-15', notes: '', specQty: 1000, specUnit: 'ml', rating: 4, brand: '蒙牛' },
+  { id: 'd21', itemId: 'item-milk', itemName: '牛奶', category: '零食饮料', price: 52, quantity: 2, totalPrice: 104, channel: '美团', date: '2026-06-28', notes: '', specQty: 250, specUnit: 'ml', rating: 3, brand: '光明' },
+  { id: 'd22', itemId: 'item-apple', itemName: '苹果', category: '柴米油盐', price: 35, quantity: 1, totalPrice: 35, channel: '盒马', date: '2026-01-18', notes: '红富士', rating: 4, brand: '' },
+  { id: 'd23', itemId: 'item-apple', itemName: '苹果', category: '柴米油盐', price: 28, quantity: 2, totalPrice: 56, channel: '美团', date: '2026-03-22', notes: '', rating: 3, brand: '' },
+  { id: 'd24', itemId: 'item-apple', itemName: '苹果', category: '柴米油盐', price: 32, quantity: 1, totalPrice: 32, channel: '永辉', date: '2026-05-10', notes: '', rating: 4, brand: '' },
+  { id: 'd25', itemId: 'item-banana', itemName: '香蕉', category: '柴米油盐', price: 12, quantity: 2, totalPrice: 24, channel: '美团', date: '2026-02-05', notes: '', rating: 5, brand: '' },
+  { id: 'd26', itemId: 'item-banana', itemName: '香蕉', category: '柴米油盐', price: 15, quantity: 1, totalPrice: 15, channel: '盒马', date: '2026-04-18', notes: '', rating: 4, brand: '' },
+  { id: 'd27', itemId: 'item-banana', itemName: '香蕉', category: '柴米油盐', price: 10, quantity: 3, totalPrice: 30, channel: '大润发', date: '2026-06-22', notes: '特价', rating: 5, brand: '' },
+  { id: 'd28', itemId: 'item-pork', itemName: '猪肉', category: '柴米油盐', price: 25, quantity: 2, totalPrice: 50, channel: '永辉', date: '2026-01-22', notes: '五花肉', rating: 4, brand: '' },
+  { id: 'd29', itemId: 'item-pork', itemName: '猪肉', category: '柴米油盐', price: 22, quantity: 2, totalPrice: 44, channel: '美团', date: '2026-03-15', notes: '', rating: 3, brand: '' },
+  { id: 'd30', itemId: 'item-pork', itemName: '猪肉', category: '柴米油盐', price: 28, quantity: 1, totalPrice: 28, channel: '山姆', date: '2026-05-28', notes: '黑猪肉', rating: 5, brand: '' },
+  { id: 'd31', itemId: 'item-chicken', itemName: '鸡胸肉', category: '柴米油盐', price: 18, quantity: 3, totalPrice: 54, channel: '山姆', date: '2026-02-12', notes: '', rating: 4, brand: '' },
+  { id: 'd32', itemId: 'item-chicken', itemName: '鸡胸肉', category: '柴米油盐', price: 15, quantity: 2, totalPrice: 30, channel: '美团', date: '2026-04-25', notes: '', rating: 3, brand: '' },
+  { id: 'd33', itemId: 'item-chicken', itemName: '鸡胸肉', category: '柴米油盐', price: 20, quantity: 2, totalPrice: 40, channel: '盒马', date: '2026-06-15', notes: '', rating: 4, brand: '' },
+  { id: 'd34', itemId: 'item-tomato', itemName: '西红柿', category: '柴米油盐', price: 8, quantity: 2, totalPrice: 16, channel: '美团', date: '2026-01-28', notes: '', rating: 4, brand: '' },
+  { id: 'd35', itemId: 'item-tomato', itemName: '西红柿', category: '柴米油盐', price: 6, quantity: 3, totalPrice: 18, channel: '永辉', date: '2026-03-25', notes: '', rating: 5, brand: '' },
+  { id: 'd36', itemId: 'item-tomato', itemName: '西红柿', category: '柴米油盐', price: 10, quantity: 2, totalPrice: 20, channel: '盒马', date: '2026-06-08', notes: '', rating: 4, brand: '' },
+  { id: 'd37', itemId: 'item-broccoli', itemName: '西兰花', category: '柴米油盐', price: 12, quantity: 2, totalPrice: 24, channel: '盒马', date: '2026-02-08', notes: '', rating: 4, brand: '' },
+  { id: 'd38', itemId: 'item-broccoli', itemName: '西兰花', category: '柴米油盐', price: 8, quantity: 2, totalPrice: 16, channel: '美团', date: '2026-04-30', notes: '', rating: 3, brand: '' },
+  { id: 'd39', itemId: 'item-broccoli', itemName: '西兰花', category: '柴米油盐', price: 10, quantity: 1, totalPrice: 10, channel: '大润发', date: '2026-06-20', notes: '', rating: 4, brand: '' },
+  { id: 'd40', itemId: 'item-chips', itemName: '薯片', category: '零食饮料', price: 12, quantity: 3, totalPrice: 36, channel: '拼多多', date: '2026-01-30', notes: '', rating: 4, brand: '乐事' },
+  { id: 'd41', itemId: 'item-chips', itemName: '薯片', category: '零食饮料', price: 15, quantity: 2, totalPrice: 30, channel: '京东', date: '2026-04-08', notes: '', rating: 3, brand: '品客' },
+  { id: 'd42', itemId: 'item-chips', itemName: '薯片', category: '零食饮料', price: 10, quantity: 4, totalPrice: 40, channel: '大润发', date: '2026-06-12', notes: '促销', rating: 5, brand: '乐事' },
+  { id: 'd43', itemId: 'item-earphone', itemName: '蓝牙耳机', category: '科技电子', price: 299, quantity: 1, totalPrice: 299, channel: '淘宝', date: '2025-12-01', notes: '降噪款', rating: 5, brand: '索尼' },
+  { id: 'd44', itemId: 'item-earphone', itemName: '蓝牙耳机', category: '科技电子', price: 199, quantity: 1, totalPrice: 199, channel: '京东', date: '2026-05-20', notes: '备用', rating: 4, brand: '漫步者' },
+  { id: 'd45', itemId: 'item-cable', itemName: '数据线', category: '科技电子', price: 15, quantity: 3, totalPrice: 45, channel: '拼多多', date: '2026-02-25', notes: 'Type-C', rating: 4, brand: '绿联' },
+  { id: 'd46', itemId: 'item-cable', itemName: '数据线', category: '科技电子', price: 12, quantity: 2, totalPrice: 24, channel: '淘宝', date: '2026-05-05', notes: '', rating: 3, brand: '品胜' },
+  { id: 'd47', itemId: 'item-toothpaste', itemName: '牙膏', category: '日用个护', price: 15, quantity: 2, totalPrice: 30, channel: '大润发', date: '2026-01-15', notes: '', rating: 4, brand: '高露洁' },
+  { id: 'd48', itemId: 'item-toothpaste', itemName: '牙膏', category: '日用个护', price: 12, quantity: 3, totalPrice: 36, channel: '山姆', date: '2026-04-15', notes: '套装', rating: 5, brand: '佳洁士' },
+  { id: 'd49', itemId: 'item-water', itemName: '矿泉水', category: '零食饮料', price: 2, quantity: 12, totalPrice: 24, channel: '美团', date: '2026-03-05', notes: '', rating: 4, brand: '农夫山泉' },
+  { id: 'd50', itemId: 'item-water', itemName: '矿泉水', category: '零食饮料', price: 2, quantity: 24, totalPrice: 48, channel: '山姆', date: '2026-06-01', notes: '整箱', rating: 5, brand: '怡宝' },
+  { id: 'd51', itemId: 'item-tissue', itemName: '抽纸', category: '日用个护', price: 28, quantity: 8, totalPrice: 224, channel: '京东', date: '2026-07-01', notes: '618返场', specQty: 120, specUnit: '抽', isPromo: true, promoType: '满减', actualPaid: 199, rating: 5, brand: '维达' },
+  { id: 'd52', itemId: 'item-milk', itemName: '牛奶', category: '零食饮料', price: 55, quantity: 2, totalPrice: 110, channel: '山姆', date: '2026-07-02', notes: '', specQty: 1000, specUnit: 'ml', rating: 4, brand: '蒙牛' },
+  { id: 'd53', itemId: 'item-eggs', itemName: '鸡蛋', category: '柴米油盐', price: 18, quantity: 2, totalPrice: 36, channel: '盒马', date: '2026-07-03', notes: '', specQty: 10, specUnit: '枚', rating: 4, brand: '' },
   // 菜市场数据
-  { id: 'd54', itemId: 'item-pork', itemName: '猪肉', category: '肉类', price: 22, quantity: 2, totalPrice: 44, channel: '菜市场', date: '2026-06-10', notes: '五花肉' },
-  { id: 'd55', itemId: 'item-tomato', itemName: '西红柿', category: '蔬菜', price: 5, quantity: 3, totalPrice: 15, channel: '菜市场', date: '2026-06-15', notes: '' },
-  { id: 'd56', itemId: 'item-apple', itemName: '苹果', category: '水果', price: 8, quantity: 5, totalPrice: 40, channel: '菜市场', date: '2026-07-01', notes: '红富士' },
-  { id: 'd57', itemId: 'item-chicken', itemName: '鸡胸肉', category: '肉类', price: 16, quantity: 2, totalPrice: 32, channel: '菜市场', date: '2026-07-02', notes: '' },
+  { id: 'd54', itemId: 'item-pork', itemName: '猪肉', category: '柴米油盐', price: 22, quantity: 2, totalPrice: 44, channel: '菜市场', date: '2026-06-10', notes: '五花肉', rating: 5, brand: '' },
+  { id: 'd55', itemId: 'item-tomato', itemName: '西红柿', category: '柴米油盐', price: 5, quantity: 3, totalPrice: 15, channel: '菜市场', date: '2026-06-15', notes: '', rating: 5, brand: '' },
+  { id: 'd56', itemId: 'item-apple', itemName: '苹果', category: '柴米油盐', price: 8, quantity: 5, totalPrice: 40, channel: '菜市场', date: '2026-07-01', notes: '红富士', rating: 4, brand: '' },
+  { id: 'd57', itemId: 'item-chicken', itemName: '鸡胸肉', category: '柴米油盐', price: 16, quantity: 2, totalPrice: 32, channel: '菜市场', date: '2026-07-02', notes: '', rating: 4, brand: '' },
   // 超市数据
-  { id: 'd58', itemId: 'item-detergent', itemName: '洗衣液', category: '日用品', price: 35, quantity: 2, totalPrice: 70, channel: '超市', date: '2026-05-20', notes: '蓝月亮' },
-  { id: 'd59', itemId: 'item-toothpaste', itemName: '牙膏', category: '个护', price: 18, quantity: 1, totalPrice: 18, channel: '超市', date: '2026-06-08', notes: '' },
-  { id: 'd60', itemId: 'item-chips', itemName: '薯片', category: '零食', price: 12, quantity: 3, totalPrice: 36, channel: '超市', date: '2026-06-25', notes: '' },
-  { id: 'd61', itemId: 'item-banana', itemName: '香蕉', category: '水果', price: 6, quantity: 4, totalPrice: 24, channel: '超市', date: '2026-07-01', notes: '' },
+  { id: 'd58', itemId: 'item-detergent', itemName: '洗衣液', category: '日用个护', price: 35, quantity: 2, totalPrice: 70, channel: '超市', date: '2026-05-20', notes: '', rating: 3, brand: '蓝月亮' },
+  { id: 'd59', itemId: 'item-toothpaste', itemName: '牙膏', category: '日用个护', price: 18, quantity: 1, totalPrice: 18, channel: '超市', date: '2026-06-08', notes: '', rating: 3, brand: '高露洁' },
+  { id: 'd60', itemId: 'item-chips', itemName: '薯片', category: '零食饮料', price: 12, quantity: 3, totalPrice: 36, channel: '超市', date: '2026-06-25', notes: '', rating: 4, brand: '乐事' },
+  { id: 'd61', itemId: 'item-banana', itemName: '香蕉', category: '柴米油盐', price: 6, quantity: 4, totalPrice: 24, channel: '超市', date: '2026-07-01', notes: '', rating: 4, brand: '' },
   // 超盒算数据
-  { id: 'd62', itemId: 'item-rice', itemName: '大米', category: '食品', price: 52, quantity: 1, totalPrice: 52, channel: '超盒算', date: '2026-05-15', notes: '5kg装' },
-  { id: 'd63', itemId: 'item-milk', itemName: '牛奶', category: '饮料', price: 48, quantity: 2, totalPrice: 96, channel: '超盒算', date: '2026-06-20', notes: '', specQty: 1000, specUnit: 'ml' },
-  { id: 'd64', itemId: 'item-eggs', itemName: '鸡蛋', category: '食品', price: 15, quantity: 2, totalPrice: 30, channel: '超盒算', date: '2026-07-01', notes: '', specQty: 10, specUnit: '枚' },
-  { id: 'd65', itemId: 'item-broccoli', itemName: '西兰花', category: '蔬菜', price: 8, quantity: 2, totalPrice: 16, channel: '超盒算', date: '2026-07-03', notes: '' },
+  { id: 'd62', itemId: 'item-rice', itemName: '大米', category: '柴米油盐', price: 52, quantity: 1, totalPrice: 52, channel: '超盒算', date: '2026-05-15', notes: '5kg装', rating: 5, brand: '金龙鱼' },
+  { id: 'd63', itemId: 'item-milk', itemName: '牛奶', category: '零食饮料', price: 48, quantity: 2, totalPrice: 96, channel: '超盒算', date: '2026-06-20', notes: '', specQty: 1000, specUnit: 'ml', rating: 5, brand: '伊利' },
+  { id: 'd64', itemId: 'item-eggs', itemName: '鸡蛋', category: '柴米油盐', price: 15, quantity: 2, totalPrice: 30, channel: '超盒算', date: '2026-07-01', notes: '', specQty: 10, specUnit: '枚', rating: 4, brand: '' },
+  { id: 'd65', itemId: 'item-broccoli', itemName: '西兰花', category: '柴米油盐', price: 8, quantity: 2, totalPrice: 16, channel: '超盒算', date: '2026-07-03', notes: '', rating: 4, brand: '' },
   // 更多分类数据
-  { id: 'd66', itemId: 'item-soap', itemName: '香皂', category: '个护', price: 8, quantity: 3, totalPrice: 24, channel: '拼多多', date: '2026-04-10', notes: '' },
-  { id: 'd67', itemId: 'item-towel', itemName: '毛巾', category: '日用品', price: 25, quantity: 2, totalPrice: 50, channel: '淘宝', date: '2026-05-05', notes: '' },
-  { id: 'd68', itemId: 'item-yogurt', itemName: '酸奶', category: '饮料', price: 12, quantity: 6, totalPrice: 72, channel: '盒马', date: '2026-06-18', notes: '' },
-  { id: 'd69', itemId: 'item-noodles', itemName: '方便面', category: '零食', price: 5, quantity: 10, totalPrice: 50, channel: '拼多多', date: '2026-06-28', notes: '整箱' },
-  { id: 'd70', itemId: 'item-orange', itemName: '橙子', category: '水果', price: 10, quantity: 3, totalPrice: 30, channel: '美团', date: '2026-07-02', notes: '' },
+  { id: 'd66', itemId: 'item-soap', itemName: '香皂', category: '日用个护', price: 8, quantity: 3, totalPrice: 24, channel: '拼多多', date: '2026-04-10', notes: '', rating: 4, brand: '舒肤佳' },
+  { id: 'd67', itemId: 'item-towel', itemName: '毛巾', category: '日用个护', price: 25, quantity: 2, totalPrice: 50, channel: '淘宝', date: '2026-05-05', notes: '', rating: 3, brand: '洁丽雅' },
+  { id: 'd68', itemId: 'item-yogurt', itemName: '酸奶', category: '零食饮料', price: 12, quantity: 6, totalPrice: 72, channel: '盒马', date: '2026-06-18', notes: '', rating: 5, brand: '安慕希' },
+  { id: 'd69', itemId: 'item-noodles', itemName: '方便面', category: '零食饮料', price: 5, quantity: 10, totalPrice: 50, channel: '拼多多', date: '2026-06-28', notes: '整箱', rating: 3, brand: '康师傅' },
+  { id: 'd70', itemId: 'item-orange', itemName: '橙子', category: '柴米油盐', price: 10, quantity: 3, totalPrice: 30, channel: '美团', date: '2026-07-02', notes: '', rating: 4, brand: '' },
 ];
 
 export const Store = {
@@ -188,6 +188,12 @@ export const Store = {
     localStorage.setItem(CHANNELS_KEY, JSON.stringify(channels));
   },
 
+  getBrands() {
+    const purchases = this.getPurchases();
+    const brands = [...new Set(purchases.map(p => p.brand).filter(Boolean))];
+    return brands.sort();
+  },
+
   getItems() {
     const purchases = this.getPurchases();
     const itemsMap = {};
@@ -229,6 +235,19 @@ export const Store = {
       const avgDuration = this.calculateAvgDuration(sortedPurchases);
       const dailyCost = avgDuration ? avgPrice / avgDuration : null;
 
+      // 品牌聚合
+      const brandMap = {};
+      item.purchases.forEach(p => {
+        if (p.brand) {
+          brandMap[p.brand] = (brandMap[p.brand] || 0) + 1;
+        }
+      });
+      const brands = Object.keys(brandMap);
+      const mainBrand = brands.length > 0
+        ? brands.reduce((a, b) => brandMap[a] > brandMap[b] ? a : b)
+        : null;
+      const brandCount = brands.length;
+
       return {
         ...item,
         maxPrice,
@@ -240,7 +259,10 @@ export const Store = {
         avgDuration,
         dailyCost,
         unitPrice,
-        specUnit: item.specUnit
+        specUnit: item.specUnit,
+        brands,
+        mainBrand,
+        brandCount
       };
     });
   },
@@ -305,10 +327,11 @@ export const Store = {
 
   exportCSV() {
     const purchases = this.getPurchases();
-    const headers = ['日期', '物品名称', '分类', '单价', '数量', '总价', '渠道', '规格数量', '规格单位', '是否促销', '促销方式', '实付金额', '备注'];
+    const headers = ['日期', '物品名称', '品牌', '分类', '单价', '数量', '总价', '渠道', '规格数量', '规格单位', '是否促销', '促销方式', '实付金额', '推荐度', '备注'];
     const rows = purchases.map(p => [
       p.date,
       p.itemName,
+      p.brand || '',
       p.category,
       p.price,
       p.quantity,
@@ -319,6 +342,7 @@ export const Store = {
       p.isPromo ? '是' : '',
       p.promoType || '',
       p.actualPaid || '',
+      p.rating || '',
       p.notes || ''
     ]);
 
@@ -332,9 +356,10 @@ export const Store = {
 
   exportItemsCSV() {
     const items = this.getItems();
-    const headers = ['物品名称', '分类', '最高价', '最低价', '平均价', '最便宜渠道', '购买次数', '平均时长(天)', '日均成本', '单位价格', '规格单位'];
+    const headers = ['物品名称', '品牌', '分类', '最高价', '最低价', '平均价', '最便宜渠道', '购买次数', '平均时长(天)', '日均成本', '单位价格', '规格单位'];
     const rows = items.map(item => [
       item.name,
+      item.mainBrand || '',
       item.category,
       item.maxPrice.toFixed(2),
       item.minPrice.toFixed(2),
@@ -443,5 +468,10 @@ export const Store = {
 
   getEffectivePrice(p) {
     return (p.isPromo && p.actualPaid) ? p.actualPaid : p.totalPrice;
-  }
+  },
+
+  // 暴露默认数据供loadDemoData使用
+  defaultPurchases,
+  defaultCategories,
+  defaultChannels
 };

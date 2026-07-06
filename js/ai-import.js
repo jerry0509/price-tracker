@@ -36,6 +36,7 @@ export function getAITemplate() {
 要求：
 1. 每条记录包含以下字段：
    - itemName: 物品名称（字符串）
+   - brand: 品牌（可选，如蓝月亮、维达、海飞丝等）
    - category: 分类（从以下选项中选择：${categories.join('、')}）
    - price: 单价（数字，单位元）
    - quantity: 数量（整数）
@@ -52,7 +53,8 @@ export function getAITemplate() {
 [
   {
     "itemName": "抽纸",
-    "category": "日用品",
+    "brand": "维达",
+    "category": "日用个护",
     "price": 29.9,
     "quantity": 10,
     "channel": "京东",
@@ -68,6 +70,7 @@ export function getAITemplate() {
 
 3. 注意事项：
    - 如果小票显示的是总价而非单价，请用总价除以数量得到单价
+   - 如果无法确定品牌，brand字段可以留空或省略
    - 如果无法确定分类，默认填"其他"
    - 如果无法确定渠道，默认填"其他"
    - 日期格式必须是 YYYY-MM-DD
@@ -231,6 +234,7 @@ export function importAIData() {
       id: generateId(),
       itemId: existingItem ? existingItem.id : generateId(),
       itemName: item.itemName,
+      brand: item.brand || '',
       category: categories.includes(item.category) ? item.category : '其他',
       price: parseFloat(item.price),
       quantity: parseInt(item.quantity) || 1,

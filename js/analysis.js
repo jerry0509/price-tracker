@@ -23,9 +23,11 @@ const colors = {
     '大润发': '#10b981',
     '盒马': '#3b82f6',
     '山姆': '#06b6d4',
-    '永辉': '#f59e0b',
+    '永辉': '#f97316',
     '美团': '#eab308',
+    '菜市场': '#84cc16',
     '超市': '#10b981',
+    '超盒算': '#14b8a6',
     '其他': '#8b5cf6'
   }
 };
@@ -92,6 +94,9 @@ function fillMonths(year) {
 function bindEvents() {
   const yearSel = document.getElementById('chart-year');
   const monthSel = document.getElementById('chart-month');
+  const dropdownBtn = document.getElementById('daily-cost-btn');
+  const dropdownContent = document.getElementById('daily-cost-options');
+  const selectAllCheckbox = document.getElementById('select-all-categories');
 
   if (yearSel) {
     yearSel.addEventListener('change', () => {
@@ -114,6 +119,38 @@ function bindEvents() {
     monthSel.addEventListener('change', () => {
       state.currentMonth = parseInt(monthSel.value);
       renderAll();
+    });
+  }
+
+  // 下拉多选框
+  if (dropdownBtn && dropdownContent) {
+    dropdownBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      dropdownContent.classList.toggle('show');
+    });
+
+    // 全选功能
+    if (selectAllCheckbox) {
+      selectAllCheckbox.addEventListener('change', () => {
+        const isChecked = selectAllCheckbox.checked;
+        const checkboxes = dropdownContent.querySelectorAll('input:not(#select-all-categories)');
+        checkboxes.forEach(cb => cb.checked = isChecked);
+        renderDailyCost();
+      });
+    }
+
+    // 点击选项时更新图表
+    dropdownContent.addEventListener('change', (e) => {
+      if (e.target !== selectAllCheckbox) {
+        renderDailyCost();
+      }
+    });
+
+    // 点击其他地方关闭下拉框
+    document.addEventListener('click', (e) => {
+      if (!dropdownContent.contains(e.target) && e.target !== dropdownBtn) {
+        dropdownContent.classList.remove('show');
+      }
     });
   }
 }
@@ -345,12 +382,40 @@ function renderChannel() {
 }
 
 /**
- * 渲染日均成本排名
+ * 渲染日均成本排名（可选分类）
  */
 function renderDailyCost() {
+  const optionsContainer = document.getElementById('daily-cost-options');
+  const btn = document.getElementById('daily-cost-btn');
+  const selectAllCheckbox = document.getElementById('select-all-categories');
+  
+  let selectedCategories = [];
+  if (optionsContainer) {
+    selectedCategories = Array.from(optionsContainer.querySelectorAll('input:checked:not(#select-all-categories)')).map(cb => cb.value);
+  }
+
+  // 更新全选框状态
+  if (selectAllCheckbox && optionsContainer) {
+    const allCheckboxes = optionsContainer.querySelectorAll('input:not(#select-all-categories)');
+    const checkedCount = optionsContainer.querySelectorAll('input:checked:not(#select-all-categories)').length;
+    selectAllCheckbox.checked = checkedCount === allCheckboxes.length;
+    selectAllCheckbox.indeterminate = checkedCount > 0 && checkedCount < allCheckboxes.length;
+  }
+
+  // 更新按钮文本
+  if (btn) {
+    if (selectedCategories.length === 0) {
+      btn.textContent = '未选择 ▾';
+    } else if (selectedCategories.length === 1) {
+      btn.textContent = selectedCategories[0] + ' ▾';
+    } else {
+      btn.textContent = selectedCategories[0] + ' +' + (selectedCategories.length - 1) + ' ▾';
+    }
+  }
+
   const items = Store.getItems();
   const data = items
-    .filter(i => i.dailyCost !== null)
+    .filter(i => i.dailyCost !== null && selectedCategories.includes(i.category))
     .map(i => ({ label: i.name, value: i.dailyCost }))
     .sort((a, b) => b.value - a.value);
 

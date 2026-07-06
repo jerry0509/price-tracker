@@ -1,0 +1,11 @@
+# IDE / Editor
+.mimocode/
+.vscode/
+.idea/
+
+# Dependencies
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db

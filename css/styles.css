@@ -646,6 +646,8 @@ tr:last-child td { border-bottom: none; }
   padding: 24px;
   backdrop-filter: blur(20px);
   transition: var(--transition);
+  display: flex;
+  flex-direction: column;
 }
 
 .chart-card:hover {
@@ -655,11 +657,82 @@ tr:last-child td { border-bottom: none; }
 .chart-card h3 {
   font-size: 14px;
   font-weight: 600;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
   display: flex;
   align-items: center;
   gap: 10px;
   color: var(--text-secondary);
+}
+
+/* 下拉多选框 */
+.dropdown-multi {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-btn {
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  white-space: nowrap;
+}
+
+.dropdown-btn:hover {
+  border-color: var(--primary-light);
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  background: var(--card-solid);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  z-index: 100;
+  min-width: 140px;
+  padding: 8px 0;
+}
+
+.dropdown-content.show {
+  display: block;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.dropdown-item:hover {
+  background: var(--primary-glow);
+}
+
+.dropdown-item input[type="checkbox"] {
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.dropdown-item-all {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
 }
 
 .chart-icon { font-size: 16px; }
@@ -669,8 +742,9 @@ tr:last-child td { border-bottom: none; }
   align-items: center;
   justify-content: center;
   gap: 32px;
-  padding: 8px 24px;
+  padding: 24px;
   width: 100%;
+  min-height: 100%;
 }
 
 .donut-chart {
@@ -1069,6 +1143,9 @@ tr:last-child td { border-bottom: none; }
   overflow-y: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  flex: 1;
+  display: flex;
+  align-items: center;
 }
 .chart-card-scroll::-webkit-scrollbar {
   display: none;
@@ -1190,3 +1267,72 @@ tr:last-child td { border-bottom: none; }
 .price-trend.up { color: var(--danger); }
 .price-trend.down { color: var(--success); }
 .price-trend.flat { color: var(--text-muted); }
+
+/* 星级评分 */
+.rating-input {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rating-stars {
+  display: flex;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.rating-stars .star {
+  font-size: 24px;
+  color: var(--border-light);
+  transition: color 0.15s ease, transform 0.15s ease;
+  user-select: none;
+}
+
+.rating-stars .star:hover,
+.rating-stars .star.hover {
+  color: var(--warning);
+  transform: scale(1.1);
+}
+
+.rating-stars .star.active {
+  color: var(--warning);
+}
+
+.rating-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.stars {
+  color: var(--warning);
+  font-size: 14px;
+  letter-spacing: 2px;
+}
+
+.stars-empty {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+/* 品牌标签 */
+.brand-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  background: rgba(99, 102, 241, 0.1);
+  color: #6366f1;
+  cursor: help;
+  vertical-align: middle;
+}
+
+.brand-tag.brand-multi {
+  background: rgba(168, 85, 247, 0.1);
+  color: #a855f7;
+}
+
+.brand-tag:hover {
+  background: rgba(99, 102, 241, 0.2);
+}

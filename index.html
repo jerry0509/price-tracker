@@ -176,12 +176,13 @@
         <div class="table-wrap">
           <table>
             <colgroup>
-              <col style="width:10%"><col style="width:16%"><col style="width:7%">
-              <col style="width:8%"><col style="width:6%"><col style="width:10%">
-              <col style="width:8%"><col style="width:22%"><col style="width:13%">
+              <col style="width:9%"><col style="width:15%"><col style="width:7%">
+              <col style="width:7%"><col style="width:7%"><col style="width:5%">
+              <col style="width:9%"><col style="width:7%"><col style="width:10%">
+              <col style="width:14%"><col style="width:10%">
             </colgroup>
             <thead><tr>
-              <th>日期</th><th>物品</th><th>分类</th><th>单价</th><th>数量</th><th>总价</th><th>渠道</th><th>备注</th><th>操作</th>
+              <th>日期</th><th>物品</th><th>品牌</th><th>分类</th><th>单价</th><th>数量</th><th>总价</th><th>渠道</th><th>推荐度</th><th>备注</th><th>操作</th>
             </tr></thead>
             <tbody id="records-tbody"></tbody>
           </table>
@@ -279,8 +280,22 @@
           <div id="chart-monthly" class="bar-chart"></div>
          </div>
          <div class="chart-card">
-           <h3>日均成本排行</h3>
-           <div id="chart-daily-cost" class="bar-chart chart-card-scroll"></div>
+           <h3 style="display:flex;justify-content:space-between;align-items:center">
+             <span>日均成本排行</span>
+             <div class="dropdown-multi" id="daily-cost-dropdown">
+               <button class="dropdown-btn" id="daily-cost-btn">日用个护 ▾</button>
+               <div class="dropdown-content" id="daily-cost-options">
+                 <label class="dropdown-item dropdown-item-all"><input type="checkbox" id="select-all-categories"> 全选</label>
+                 <div class="dropdown-divider"></div>
+                 <label class="dropdown-item"><input type="checkbox" value="日用个护" checked> 日用个护</label>
+                 <label class="dropdown-item"><input type="checkbox" value="柴米油盐"> 柴米油盐</label>
+                 <label class="dropdown-item"><input type="checkbox" value="零食饮料"> 零食饮料</label>
+                 <label class="dropdown-item"><input type="checkbox" value="科技电子"> 科技电子</label>
+                 <label class="dropdown-item"><input type="checkbox" value="其他"> 其他</label>
+               </div>
+             </div>
+           </h3>
+           <div id="chart-daily-cost" class="bar-chart"></div>
         </div>
       </div>
     </main>
@@ -339,7 +354,7 @@
 
 示例：
 [
-  {"itemName":"抽纸","category":"日用品","price":29.9,"quantity":10,"channel":"京东","date":"2026-06-30","notes":""}
+  {"itemName":"抽纸","brand":"维达","category":"日用个护","price":29.9,"quantity":10,"channel":"京东","date":"2026-06-30","notes":""}
 ]'></textarea>
       </div>
     </main>
@@ -355,6 +370,11 @@
             <label>物品名称 <span class="required">*</span></label>
             <input class="input" id="item-name" placeholder="输入物品名称" required autocomplete="off">
             <div id="autocomplete-list" class="autocomplete-list" style="display:none"></div>
+          </div>
+          <div class="form-group">
+            <label>品牌</label>
+            <input class="input" id="item-brand" placeholder="如：蓝月亮" list="brand-list" autocomplete="off">
+            <datalist id="brand-list"></datalist>
           </div>
           <div class="form-group">
             <label>分类</label>
@@ -429,6 +449,22 @@
         </div>
         <div class="form-row">
           <div class="form-group">
+            <label>推荐度</label>
+            <div class="rating-input">
+              <input type="hidden" id="item-rating" value="0">
+              <div id="rating-stars" class="rating-stars">
+                <span class="star" data-rating="1">★</span>
+                <span class="star" data-rating="2">★</span>
+                <span class="star" data-rating="3">★</span>
+                <span class="star" data-rating="4">★</span>
+                <span class="star" data-rating="5">★</span>
+              </div>
+              <span class="rating-hint">点击星星评分</span>
+            </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
             <label>备注</label>
             <input class="input" id="item-notes" placeholder="可选">
           </div>
@@ -489,6 +525,7 @@
           <thead>
             <tr>
               <th>日期</th>
+              <th>品牌</th>
               <th>单价</th>
               <th>数量</th>
               <th>总价</th>

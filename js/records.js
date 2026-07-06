@@ -27,6 +27,70 @@ export function init() {
 }
 
 /**
+ * 渲染星级评分
+ * @param {number} rating - 评分 (1-5)
+ * @returns {string} HTML 字符串
+ */
+function renderStars(rating) {
+  if (!rating) return '<span class="stars-empty">-</span>';
+  const stars = [];
+  for (let i = 1; i <= 5; i++) {
+    stars.push(i <= rating ? '★' : '☆');
+  }
+  return `<span class="stars">${stars.join('')}</span>`;
+}
+
+/**
+ * 设置表单中的星级评分
+ * @param {number} rating - 评分 (0-5)
+ */
+function setRating(rating) {
+  const stars = document.querySelectorAll('#rating-stars .star');
+  stars.forEach((star, index) => {
+    star.classList.toggle('active', index < rating);
+  });
+  document.getElementById('item-rating').value = rating;
+}
+
+/**
+ * 获取表单中的星级评分
+ * @returns {number} 评分
+ */
+function getRating() {
+  return parseInt(document.getElementById('item-rating').value) || 0;
+}
+
+/**
+ * 初始化星级评分交互
+ */
+export function initRatingStars() {
+  const container = document.getElementById('rating-stars');
+  if (!container) return;
+
+  container.addEventListener('click', (e) => {
+    const star = e.target.closest('.star');
+    if (!star) return;
+    const rating = parseInt(star.dataset.rating);
+    setRating(rating);
+  });
+
+  container.addEventListener('mouseover', (e) => {
+    const star = e.target.closest('.star');
+    if (!star) return;
+    const rating = parseInt(star.dataset.rating);
+    const stars = container.querySelectorAll('.star');
+    stars.forEach((s, i) => {
+      s.classList.toggle('hover', i < rating);
+    });
+  });
+
+  container.addEventListener('mouseout', () => {
+    const stars = container.querySelectorAll('.star');
+    stars.forEach(s => s.classList.remove('hover'));
+  });
+}
+
+/**
  * 设置当前页
  */
 export function setCurrentPage(page) {
@@ -71,6 +135,7 @@ export function render(filters = {}) {
         ${p.specQty && p.specUnit ? `<span class="spec-tag">${p.specQty}${p.specUnit}/份</span>` : ''}
         ${p.isPromo ? `<span class="promo-badge">🏷️${p.promoType || '促销'}</span>` : ''}
       </td>
+      <td>${p.brand ? `<span class="brand-tag">${escapeHtml(p.brand)}</span>` : '-'}</td>
       <td><span class="tag">${escapeHtml(p.category)}</span></td>
       <td class="price">${formatPrice(p.price)}</td>
       <td>${p.quantity}</td>
@@ -78,6 +143,7 @@ export function render(filters = {}) {
         ${p.isPromo && p.actualPaid ? `<s style="color:var(--text-muted);font-size:11px">${formatPrice(p.totalPrice)}</s> ${formatPrice(p.actualPaid)}` : formatPrice(p.totalPrice)}
       </td>
       <td>${escapeHtml(p.channel)}</td>
+      <td>${renderStars(p.rating)}</td>
       <td style="color:var(--text-secondary)">${escapeHtml(p.notes || '')}</td>
       <td>
         <div class="actions">
@@ -105,6 +171,7 @@ function getFilteredPurchases(filters) {
       p.itemName.toLowerCase().includes(search) ||
       p.category.toLowerCase().includes(search) ||
       p.channel.toLowerCase().includes(search) ||
+      (p.brand && p.brand.toLowerCase().includes(search)) ||
       (p.notes && p.notes.toLowerCase().includes(search))
     );
   }
@@ -182,6 +249,7 @@ export function showPurchaseModal(purchase = null) {
   if (purchase) {
     document.getElementById('item-id').value = purchase.id;
     document.getElementById('item-name').value = purchase.itemName;
+    document.getElementById('item-brand').value = purchase.brand || '';
     document.getElementById('item-category').value = purchase.category;
     document.getElementById('item-price').value = purchase.price;
     document.getElementById('item-quantity').value = purchase.quantity;
@@ -195,16 +263,19 @@ export function showPurchaseModal(purchase = null) {
     document.getElementById('item-promo-type').value = purchase.promoType || '';
     document.getElementById('item-actual-paid').value = purchase.actualPaid || '';
     document.getElementById('promo-fields').style.display = purchase.isPromo ? 'flex' : 'none';
+    setRating(purchase.rating || 0);
   } else {
     form.reset();
     document.getElementById('item-id').value = '';
     document.getElementById('item-date').value = formatDate(new Date());
     document.getElementById('item-quantity').value = '1';
     document.getElementById('promo-fields').style.display = 'none';
+    setRating(0);
   }
 
   updateCategorySelect();
   updateChannelSelect();
+  updateBrandSelect();
 
   modal.classList.add('show');
 }
@@ -225,6 +296,7 @@ export function closePurchaseModal() {
 export function savePurchase() {
   const id = document.getElementById('item-id').value;
   const itemName = document.getElementById('item-name').value.trim();
+  const brand = document.getElementById('item-brand').value.trim();
   const category = document.getElementById('item-category').value.trim() || '其他';
   const price = parseFloat(document.getElementById('item-price').value);
   const quantity = parseInt(document.getElementById('item-quantity').value) || 1;
@@ -236,6 +308,7 @@ export function savePurchase() {
   const isPromo = document.getElementById('item-is-promo').checked;
   const promoType = document.getElementById('item-promo-type').value || null;
   const actualPaid = parseFloat(document.getElementById('item-actual-paid').value) || null;
+  const rating = getRating();
 
   if (!itemName || !price || !date) {
     EventBus.emit('toast:show', { message: '请填写必填项', type: 'error' });
@@ -266,6 +339,7 @@ export function savePurchase() {
     id: id || generateId(),
     itemId,
     itemName,
+    brand,
     category,
     price,
     quantity,
@@ -277,7 +351,8 @@ export function savePurchase() {
     specUnit,
     isPromo,
     promoType,
-    actualPaid
+    actualPaid,
+    rating
   };
 
   if (id) {
@@ -407,6 +482,19 @@ export function updateChannelSelect() {
   const channels = Store.getChannels();
   datalist.innerHTML = channels.map(ch =>
     `<option value="${escapeHtml(ch)}">`
+  ).join('');
+}
+
+/**
+ * 更新品牌选择器
+ */
+export function updateBrandSelect() {
+  const datalist = document.getElementById('brand-list');
+  if (!datalist) return;
+
+  const brands = Store.getBrands();
+  datalist.innerHTML = brands.map(brand =>
+    `<option value="${escapeHtml(brand)}">`
   ).join('');
 }
 
