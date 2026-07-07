@@ -13,7 +13,7 @@
 - **规格追踪** — 支持不同规格（120抽/250ml/30枚），自动计算单位价格
 - **AI 智能导入** — 拍照识别小票，AI 自动解析为结构化数据
 - **导入导出** — 支持 JSON/CSV 格式，CSV 包含全部字段
-- **暗色模式** — 自动跟随系统主题
+- **暖白主题** — 阳光活力的暖白配色
 - **响应式设计** — 桌面、平板、手机均可使用
 
 ## 分类体系
@@ -28,19 +28,9 @@
 
 ## 使用方法
 
-### 方式一：直接打开
+### 启动方式
 
-双击 `open-app.bat`，或用浏览器打开 `index.html`
-
-### 方式二：本地服务器
-
-双击 `start-server.bat`，或运行：
-
-```bash
-python -m http.server 8080
-```
-
-然后访问 http://localhost:8080
+双击 `start-price-tracker.bat`，或用浏览器直接打开 `index.html`
 
 ## 项目结构
 
@@ -52,14 +42,16 @@ price-tracker/
 ├── js/
 │   ├── app.js          # 主应用逻辑
 │   ├── store.js        # 数据存储（localStorage）
+│   ├── store-stats.js  # 统计计算
 │   ├── overview.js     # 价格总览模块
 │   ├── records.js      # 购买记录模块
+│   ├── records-modal.js# 记录弹窗
 │   ├── analysis.js     # 数据分析模块
+│   ├── analysis-charts.js # 图表渲染
 │   ├── ai-import.js    # AI智能导入
 │   ├── eventBus.js     # 事件总线
 │   └── utils.js        # 工具函数
-├── open-app.bat        # 双击打开应用
-├── start-server.bat    # 启动本地服务器
+├── start-price-tracker.bat  # 启动脚本
 └── README.md
 ```
 
