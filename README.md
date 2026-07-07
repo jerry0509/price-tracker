@@ -103,11 +103,14 @@ price-tracker/
 
 ## 技术栈
 
-- 纯 HTML + CSS + JavaScript
-- 零外部依赖
-- localStorage 存储
-- CSS 变量管理主题
-- EventBus 模块通信
+- 前端：HTML5 + CSS3 + ES6+ JavaScript
+- 模块化：ES Modules (import/export)
+- 存储：localStorage
+- 架构：EventBus 发布订阅模式
+- 图表：Canvas API 手绘
+- 样式：CSS Variables 主题系统
+- 兼容：响应式布局，支持暗色模式
+- 依赖：零外部依赖，纯原生实现
 
 ## 浏览器支持
 

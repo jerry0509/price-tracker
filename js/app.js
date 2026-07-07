@@ -373,7 +373,7 @@ function showToast(message, type = 'success') {
 
   const toast = document.createElement('div');
   toast.className = `toast toast-${type}`;
-  toast.innerHTML = `<span>${message}</span>`;
+  toast.textContent = message;
 
   container.appendChild(toast);
 

@@ -5,7 +5,7 @@
 
 import { EventBus } from './eventBus.js';
 import { Store } from './store.js';
-import { escapeHtml, generateId, formatDate } from './utils.js';
+import { escapeHtml, generateId, formatDate, roundPrice } from './utils.js';
 
 /**
  * 初始化模块
@@ -238,7 +238,7 @@ export function importAIData() {
       category: categories.includes(item.category) ? item.category : '其他',
       price: parseFloat(item.price),
       quantity: parseInt(item.quantity) || 1,
-      totalPrice: parseFloat(item.price) * (parseInt(item.quantity) || 1),
+      totalPrice: roundPrice(parseFloat(item.price) * (parseInt(item.quantity) || 1)),
       channel: channels.includes(item.channel) ? item.channel : '其他',
       date: item.date || today,
       notes: item.notes || '',

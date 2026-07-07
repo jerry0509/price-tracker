@@ -65,6 +65,15 @@ export function formatPrice(price) {
 }
 
 /**
+ * 四舍五入到分（避免浮点精度问题）
+ * @param {number} price - 价格
+ * @returns {number} 精确到分的价格
+ */
+export function roundPrice(price) {
+  return Math.round(Number(price) * 100) / 100;
+}
+
+/**
  * 格式化数字（千分位）
  * @param {number} num - 数字
  * @returns {string} 格式化后的字符串

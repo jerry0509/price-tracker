@@ -4,13 +4,24 @@
  */
 
 import { EventBus } from './eventBus.js';
-import { generateId, daysBetween, formatDate, getCurrentMonth, getCurrentYear } from './utils.js';
+import { generateId, daysBetween, formatDate, roundPrice } from './utils.js';
+import {
+  getMonthlySpending, getCategorySpending, getChannelSpending,
+  getCurrentMonthSpending, getCurrentYearSpending, getTotalSpending,
+  getEffectivePrice
+} from './store-stats.js';
 
 const STORAGE_KEY = 'price-tracker-data';
 const CATEGORIES_KEY = 'price-tracker-categories';
 const CHANNELS_KEY = 'price-tracker-channels';
 const VERSION_KEY = 'price-tracker-version';
 const CURRENT_VERSION = '3.8';
+
+// 内存缓存
+let _purchasesCache = null;
+let _categoriesCache = null;
+let _channelsCache = null;
+let _itemsCache = null;
 
 const defaultCategories = ['日用个护', '柴米油盐', '零食饮料', '科技电子', '其他'];
 const defaultChannels = ['京东', '淘宝', '拼多多', '大润发', '盒马', '山姆', '永辉', '美团', '菜市场', '超市', '超盒算', '其他'];
@@ -69,22 +80,18 @@ const defaultPurchases = [
   { id: 'd51', itemId: 'item-tissue', itemName: '抽纸', category: '日用个护', price: 28, quantity: 8, totalPrice: 224, channel: '京东', date: '2026-07-01', notes: '618返场', specQty: 120, specUnit: '抽', isPromo: true, promoType: '满减', actualPaid: 199, rating: 5, brand: '维达' },
   { id: 'd52', itemId: 'item-milk', itemName: '牛奶', category: '零食饮料', price: 55, quantity: 2, totalPrice: 110, channel: '山姆', date: '2026-07-02', notes: '', specQty: 1000, specUnit: 'ml', rating: 4, brand: '蒙牛' },
   { id: 'd53', itemId: 'item-eggs', itemName: '鸡蛋', category: '柴米油盐', price: 18, quantity: 2, totalPrice: 36, channel: '盒马', date: '2026-07-03', notes: '', specQty: 10, specUnit: '枚', rating: 4, brand: '' },
-  // 菜市场数据
   { id: 'd54', itemId: 'item-pork', itemName: '猪肉', category: '柴米油盐', price: 22, quantity: 2, totalPrice: 44, channel: '菜市场', date: '2026-06-10', notes: '五花肉', rating: 5, brand: '' },
   { id: 'd55', itemId: 'item-tomato', itemName: '西红柿', category: '柴米油盐', price: 5, quantity: 3, totalPrice: 15, channel: '菜市场', date: '2026-06-15', notes: '', rating: 5, brand: '' },
   { id: 'd56', itemId: 'item-apple', itemName: '苹果', category: '柴米油盐', price: 8, quantity: 5, totalPrice: 40, channel: '菜市场', date: '2026-07-01', notes: '红富士', rating: 4, brand: '' },
   { id: 'd57', itemId: 'item-chicken', itemName: '鸡胸肉', category: '柴米油盐', price: 16, quantity: 2, totalPrice: 32, channel: '菜市场', date: '2026-07-02', notes: '', rating: 4, brand: '' },
-  // 超市数据
   { id: 'd58', itemId: 'item-detergent', itemName: '洗衣液', category: '日用个护', price: 35, quantity: 2, totalPrice: 70, channel: '超市', date: '2026-05-20', notes: '', rating: 3, brand: '蓝月亮' },
   { id: 'd59', itemId: 'item-toothpaste', itemName: '牙膏', category: '日用个护', price: 18, quantity: 1, totalPrice: 18, channel: '超市', date: '2026-06-08', notes: '', rating: 3, brand: '高露洁' },
   { id: 'd60', itemId: 'item-chips', itemName: '薯片', category: '零食饮料', price: 12, quantity: 3, totalPrice: 36, channel: '超市', date: '2026-06-25', notes: '', rating: 4, brand: '乐事' },
   { id: 'd61', itemId: 'item-banana', itemName: '香蕉', category: '柴米油盐', price: 6, quantity: 4, totalPrice: 24, channel: '超市', date: '2026-07-01', notes: '', rating: 4, brand: '' },
-  // 超盒算数据
   { id: 'd62', itemId: 'item-rice', itemName: '大米', category: '柴米油盐', price: 52, quantity: 1, totalPrice: 52, channel: '超盒算', date: '2026-05-15', notes: '5kg装', rating: 5, brand: '金龙鱼' },
   { id: 'd63', itemId: 'item-milk', itemName: '牛奶', category: '零食饮料', price: 48, quantity: 2, totalPrice: 96, channel: '超盒算', date: '2026-06-20', notes: '', specQty: 1000, specUnit: 'ml', rating: 5, brand: '伊利' },
   { id: 'd64', itemId: 'item-eggs', itemName: '鸡蛋', category: '柴米油盐', price: 15, quantity: 2, totalPrice: 30, channel: '超盒算', date: '2026-07-01', notes: '', specQty: 10, specUnit: '枚', rating: 4, brand: '' },
   { id: 'd65', itemId: 'item-broccoli', itemName: '西兰花', category: '柴米油盐', price: 8, quantity: 2, totalPrice: 16, channel: '超盒算', date: '2026-07-03', notes: '', rating: 4, brand: '' },
-  // 更多分类数据
   { id: 'd66', itemId: 'item-soap', itemName: '香皂', category: '日用个护', price: 8, quantity: 3, totalPrice: 24, channel: '拼多多', date: '2026-04-10', notes: '', rating: 4, brand: '舒肤佳' },
   { id: 'd67', itemId: 'item-towel', itemName: '毛巾', category: '日用个护', price: 25, quantity: 2, totalPrice: 50, channel: '淘宝', date: '2026-05-05', notes: '', rating: 3, brand: '洁丽雅' },
   { id: 'd68', itemId: 'item-yogurt', itemName: '酸奶', category: '零食饮料', price: 12, quantity: 6, totalPrice: 72, channel: '盒马', date: '2026-06-18', notes: '', rating: 5, brand: '安慕希' },
@@ -108,9 +115,11 @@ export const Store = {
   },
 
   getPurchases() {
+    if (_purchasesCache !== null) return _purchasesCache;
     try {
       const data = localStorage.getItem(STORAGE_KEY);
-      return data ? JSON.parse(data) : [];
+      _purchasesCache = data ? JSON.parse(data) : [];
+      return _purchasesCache;
     } catch (e) {
       console.error('Failed to parse purchases:', e);
       return [];
@@ -120,6 +129,8 @@ export const Store = {
   savePurchases(purchases) {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(purchases));
+      _purchasesCache = purchases;
+      _itemsCache = null;
     } catch (e) {
       console.error('Failed to save purchases:', e);
     }
@@ -128,8 +139,8 @@ export const Store = {
   addPurchase(purchase) {
     const purchases = this.getPurchases();
     purchase.id = purchase.id || generateId();
-    purchase.totalPrice = purchase.price * purchase.quantity;
-    purchase.createdAt = Date.now(); // 添加时间戳
+    purchase.totalPrice = roundPrice(purchase.price * purchase.quantity);
+    purchase.createdAt = Date.now();
     purchases.push(purchase);
     this.savePurchases(purchases);
     EventBus.emit('purchase:added', purchase);
@@ -142,7 +153,7 @@ export const Store = {
     if (index !== -1) {
       purchases[index] = { ...purchases[index], ...updates };
       if (updates.price || updates.quantity) {
-        purchases[index].totalPrice = purchases[index].price * purchases[index].quantity;
+        purchases[index].totalPrice = roundPrice(purchases[index].price * purchases[index].quantity);
       }
       this.savePurchases(purchases);
       EventBus.emit('purchase:updated', purchases[index]);
@@ -163,29 +174,43 @@ export const Store = {
   },
 
   getCategories() {
+    if (_categoriesCache !== null) return _categoriesCache;
     try {
       const data = localStorage.getItem(CATEGORIES_KEY);
-      return data ? JSON.parse(data) : defaultCategories;
+      _categoriesCache = data ? JSON.parse(data) : defaultCategories;
+      return _categoriesCache;
     } catch (e) {
       return defaultCategories;
     }
   },
 
   saveCategories(categories) {
-    localStorage.setItem(CATEGORIES_KEY, JSON.stringify(categories));
+    try {
+      localStorage.setItem(CATEGORIES_KEY, JSON.stringify(categories));
+      _categoriesCache = categories;
+    } catch (e) {
+      console.error('Failed to save categories:', e);
+    }
   },
 
   getChannels() {
+    if (_channelsCache !== null) return _channelsCache;
     try {
       const data = localStorage.getItem(CHANNELS_KEY);
-      return data ? JSON.parse(data) : defaultChannels;
+      _channelsCache = data ? JSON.parse(data) : defaultChannels;
+      return _channelsCache;
     } catch (e) {
       return defaultChannels;
     }
   },
 
   saveChannels(channels) {
-    localStorage.setItem(CHANNELS_KEY, JSON.stringify(channels));
+    try {
+      localStorage.setItem(CHANNELS_KEY, JSON.stringify(channels));
+      _channelsCache = channels;
+    } catch (e) {
+      console.error('Failed to save channels:', e);
+    }
   },
 
   getBrands() {
@@ -195,6 +220,7 @@ export const Store = {
   },
 
   getItems() {
+    if (_itemsCache !== null) return _itemsCache;
     const purchases = this.getPurchases();
     const itemsMap = {};
 
@@ -211,11 +237,11 @@ export const Store = {
       itemsMap[p.itemId].purchases.push(p);
     });
 
-    return Object.values(itemsMap).map(item => {
+    const result = Object.values(itemsMap).map(item => {
       const prices = item.purchases.map(p => p.price);
       const maxPrice = Math.max(...prices);
       const minPrice = Math.min(...prices);
-      const avgPrice = prices.reduce((a, b) => a + b, 0) / prices.length;
+      const avgPrice = roundPrice(prices.reduce((a, b) => a + b, 0) / prices.length);
       const cheapestPurchase = item.purchases.reduce((min, p) => p.price < min.price ? p : min, item.purchases[0]);
       const totalPurchases = item.purchases.length;
       const totalQuantity = item.purchases.reduce((sum, p) => sum + p.quantity, 0);
@@ -226,16 +252,15 @@ export const Store = {
         const unitPrices = specPurchases.map(p => {
           const totalUnits = p.specQty * p.quantity;
           const paid = p.actualPaid || p.totalPrice;
-          return paid / totalUnits;
+          return roundPrice(paid / totalUnits);
         });
-        unitPrice = unitPrices.reduce((a, b) => a + b, 0) / unitPrices.length;
+        unitPrice = roundPrice(unitPrices.reduce((a, b) => a + b, 0) / unitPrices.length);
       }
 
       const sortedPurchases = [...item.purchases].sort((a, b) => new Date(a.date) - new Date(b.date));
       const avgDuration = this.calculateAvgDuration(sortedPurchases);
-      const dailyCost = avgDuration ? avgPrice / avgDuration : null;
+      const dailyCost = avgDuration ? roundPrice(avgPrice / avgDuration) : null;
 
-      // 品牌聚合
       const brandMap = {};
       item.purchases.forEach(p => {
         if (p.brand) {
@@ -265,6 +290,8 @@ export const Store = {
         brandCount
       };
     });
+    _itemsCache = result;
+    return _itemsCache;
   },
 
   calculateAvgDuration(sortedPurchases) {
@@ -329,21 +356,9 @@ export const Store = {
     const purchases = this.getPurchases();
     const headers = ['日期', '物品名称', '品牌', '分类', '单价', '数量', '总价', '渠道', '规格数量', '规格单位', '是否促销', '促销方式', '实付金额', '推荐度', '备注'];
     const rows = purchases.map(p => [
-      p.date,
-      p.itemName,
-      p.brand || '',
-      p.category,
-      p.price,
-      p.quantity,
-      p.totalPrice,
-      p.channel,
-      p.specQty || '',
-      p.specUnit || '',
-      p.isPromo ? '是' : '',
-      p.promoType || '',
-      p.actualPaid || '',
-      p.rating || '',
-      p.notes || ''
+      p.date, p.itemName, p.brand || '', p.category, p.price, p.quantity, p.totalPrice,
+      p.channel, p.specQty || '', p.specUnit || '', p.isPromo ? '是' : '', p.promoType || '',
+      p.actualPaid || '', p.rating || '', p.notes || ''
     ]);
 
     const csvContent = [
@@ -358,18 +373,11 @@ export const Store = {
     const items = this.getItems();
     const headers = ['物品名称', '品牌', '分类', '最高价', '最低价', '平均价', '最便宜渠道', '购买次数', '平均时长(天)', '日均成本', '单位价格', '规格单位'];
     const rows = items.map(item => [
-      item.name,
-      item.mainBrand || '',
-      item.category,
-      item.maxPrice.toFixed(2),
-      item.minPrice.toFixed(2),
-      item.avgPrice.toFixed(2),
-      item.cheapestChannel,
-      item.totalPurchases,
+      item.name, item.mainBrand || '', item.category, item.maxPrice.toFixed(2), item.minPrice.toFixed(2),
+      item.avgPrice.toFixed(2), item.cheapestChannel, item.totalPurchases,
       item.avgDuration ? item.avgDuration.toFixed(1) : '数据不足',
       item.dailyCost ? item.dailyCost.toFixed(2) : 'N/A',
-      item.unitPrice !== null ? item.unitPrice.toFixed(4) : '',
-      item.specUnit || ''
+      item.unitPrice !== null ? item.unitPrice.toFixed(4) : '', item.specUnit || ''
     ]);
 
     const csvContent = [
@@ -417,58 +425,14 @@ export const Store = {
     }
   },
 
-  getMonthlySpending() {
-    const purchases = this.getPurchases();
-    const monthly = {};
-    purchases.forEach(p => {
-      const month = p.date.substring(0, 7);
-      monthly[month] = (monthly[month] || 0) + this.getEffectivePrice(p);
-    });
-    return monthly;
-  },
-
-  getCategorySpending() {
-    const purchases = this.getPurchases();
-    const category = {};
-    purchases.forEach(p => {
-      category[p.category] = (category[p.category] || 0) + this.getEffectivePrice(p);
-    });
-    return category;
-  },
-
-  getChannelSpending() {
-    const purchases = this.getPurchases();
-    const channel = {};
-    purchases.forEach(p => {
-      channel[p.channel] = (channel[p.channel] || 0) + this.getEffectivePrice(p);
-    });
-    return channel;
-  },
-
-  getCurrentMonthSpending() {
-    const currentMonth = getCurrentMonth();
-    const purchases = this.getPurchases();
-    return purchases
-      .filter(p => p.date.startsWith(currentMonth))
-      .reduce((sum, p) => sum + this.getEffectivePrice(p), 0);
-  },
-
-  getCurrentYearSpending() {
-    const currentYear = getCurrentYear();
-    const purchases = this.getPurchases();
-    return purchases
-      .filter(p => p.date.startsWith(currentYear))
-      .reduce((sum, p) => sum + this.getEffectivePrice(p), 0);
-  },
-
-  getTotalSpending() {
-    const purchases = this.getPurchases();
-    return purchases.reduce((sum, p) => sum + this.getEffectivePrice(p), 0);
-  },
-
-  getEffectivePrice(p) {
-    return (p.isPromo && p.actualPaid) ? p.actualPaid : p.totalPrice;
-  },
+  // 委托给store-stats.js的方法
+  getMonthlySpending() { return getMonthlySpending(this.getPurchases(), getEffectivePrice); },
+  getCategorySpending() { return getCategorySpending(this.getPurchases(), getEffectivePrice); },
+  getChannelSpending() { return getChannelSpending(this.getPurchases(), getEffectivePrice); },
+  getCurrentMonthSpending() { return getCurrentMonthSpending(this.getPurchases(), getEffectivePrice); },
+  getCurrentYearSpending() { return getCurrentYearSpending(this.getPurchases(), getEffectivePrice); },
+  getTotalSpending() { return getTotalSpending(this.getPurchases(), getEffectivePrice); },
+  getEffectivePrice,
 
   // 暴露默认数据供loadDemoData使用
   defaultPurchases,

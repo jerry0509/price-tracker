@@ -1,11 +1,17 @@
 /**
  * Records - 购买记录模块
- * 职责：记录列表、筛选、CRUD、自动补全
+ * 职责：记录列表、筛选、分页
  */
 
 import { EventBus } from './eventBus.js';
 import { Store } from './store.js';
-import { escapeHtml, formatPrice, formatDate, generateId, debounce } from './utils.js';
+import { escapeHtml, formatPrice } from './utils.js';
+import {
+  showPurchaseModal, closePurchaseModal, savePurchase,
+  editPurchase, deletePurchase, handleItemNameInput,
+  hideAutocomplete, calculateTotal, initRatingStars,
+  updateCategorySelect, updateChannelSelect, updateBrandSelect
+} from './records-modal.js';
 
 // 模块状态
 const state = {
@@ -19,7 +25,6 @@ const state = {
  * 初始化模块
  */
 export function init() {
-  // 监听数据变化事件
   EventBus.on('purchase:added', () => render(state.filters));
   EventBus.on('purchase:updated', () => render(state.filters));
   EventBus.on('purchase:deleted', () => render(state.filters));
@@ -28,8 +33,6 @@ export function init() {
 
 /**
  * 渲染星级评分
- * @param {number} rating - 评分 (1-5)
- * @returns {string} HTML 字符串
  */
 function renderStars(rating) {
   if (!rating) return '<span class="stars-empty">-</span>';
@@ -41,56 +44,6 @@ function renderStars(rating) {
 }
 
 /**
- * 设置表单中的星级评分
- * @param {number} rating - 评分 (0-5)
- */
-function setRating(rating) {
-  const stars = document.querySelectorAll('#rating-stars .star');
-  stars.forEach((star, index) => {
-    star.classList.toggle('active', index < rating);
-  });
-  document.getElementById('item-rating').value = rating;
-}
-
-/**
- * 获取表单中的星级评分
- * @returns {number} 评分
- */
-function getRating() {
-  return parseInt(document.getElementById('item-rating').value) || 0;
-}
-
-/**
- * 初始化星级评分交互
- */
-export function initRatingStars() {
-  const container = document.getElementById('rating-stars');
-  if (!container) return;
-
-  container.addEventListener('click', (e) => {
-    const star = e.target.closest('.star');
-    if (!star) return;
-    const rating = parseInt(star.dataset.rating);
-    setRating(rating);
-  });
-
-  container.addEventListener('mouseover', (e) => {
-    const star = e.target.closest('.star');
-    if (!star) return;
-    const rating = parseInt(star.dataset.rating);
-    const stars = container.querySelectorAll('.star');
-    stars.forEach((s, i) => {
-      s.classList.toggle('hover', i < rating);
-    });
-  });
-
-  container.addEventListener('mouseout', () => {
-    const stars = container.querySelectorAll('.star');
-    stars.forEach(s => s.classList.remove('hover'));
-  });
-}
-
-/**
  * 设置当前页
  */
 export function setCurrentPage(page) {
@@ -98,7 +51,7 @@ export function setCurrentPage(page) {
 }
 
 /**
- * 获取当前状态（供 app.js 访问）
+ * 获取当前状态
  */
 export function getState() {
   return { ...state };
@@ -106,10 +59,8 @@ export function getState() {
 
 /**
  * 渲染记录页面
- * @param {Object} filters - 筛选条件
  */
 export function render(filters = {}) {
-  // 保存当前筛选条件
   state.filters = filters;
   
   const allPurchases = getFilteredPurchases(filters);
@@ -132,8 +83,8 @@ export function render(filters = {}) {
       <td>${escapeHtml(p.date)}</td>
       <td>
         <strong>${escapeHtml(p.itemName)}</strong>
-        ${p.specQty && p.specUnit ? `<span class="spec-tag">${p.specQty}${p.specUnit}/份</span>` : ''}
-        ${p.isPromo ? `<span class="promo-badge">🏷️${p.promoType || '促销'}</span>` : ''}
+        ${p.specQty && p.specUnit ? `<span class="spec-tag">${escapeHtml(String(p.specQty))}${escapeHtml(p.specUnit)}/份</span>` : ''}
+        ${p.isPromo ? `<span class="promo-badge">🏷️${escapeHtml(p.promoType || '促销')}</span>` : ''}
       </td>
       <td>${p.brand ? `<span class="brand-tag">${escapeHtml(p.brand)}</span>` : '-'}</td>
       <td><span class="tag">${escapeHtml(p.category)}</span></td>
@@ -159,8 +110,6 @@ export function render(filters = {}) {
 
 /**
  * 获取筛选后的记录
- * @param {Object} filters - 筛选条件
- * @returns {Array} 筛选后的记录列表
  */
 function getFilteredPurchases(filters) {
   let purchases = Store.getPurchases();
@@ -193,23 +142,17 @@ function getFilteredPurchases(filters) {
   }
 
   return purchases.sort((a, b) => {
-    // 按添加时间倒序（新数据在前）
     const aTime = a.createdAt || 0;
     const bTime = b.createdAt || 0;
-    if (aTime !== bTime) {
-      return bTime - aTime;
-    }
-    // 时间相同时，按日期倒序
+    if (aTime !== bTime) return bTime - aTime;
     const dateDiff = new Date(b.date) - new Date(a.date);
     if (dateDiff !== 0) return dateDiff;
-    // 日期相同时，按id倒序
     return b.id.localeCompare(a.id);
   });
 }
 
 /**
  * 更新记录汇总信息
- * @param {Array} purchases - 记录列表
  */
 function updateRecordsSummary(purchases) {
   const currentMonth = new Date().toISOString().substring(0, 7);
@@ -233,275 +176,7 @@ function updateRecordsSummary(purchases) {
 }
 
 /**
- * 显示购买记录模态框
- * @param {Object|null} purchase - 购买记录（编辑模式）或null（新增模式）
- */
-export function showPurchaseModal(purchase = null) {
-  state.editingPurchase = purchase;
-  const modal = document.getElementById('modal-purchase');
-  const form = document.getElementById('purchase-form');
-  const title = document.getElementById('modal-purchase-title');
-
-  if (!modal || !form) return;
-
-  if (title) title.textContent = purchase ? '编辑购买记录' : '添加购买记录';
-
-  if (purchase) {
-    document.getElementById('item-id').value = purchase.id;
-    document.getElementById('item-name').value = purchase.itemName;
-    document.getElementById('item-brand').value = purchase.brand || '';
-    document.getElementById('item-category').value = purchase.category;
-    document.getElementById('item-price').value = purchase.price;
-    document.getElementById('item-quantity').value = purchase.quantity;
-    document.getElementById('item-total').value = purchase.totalPrice;
-    document.getElementById('item-channel').value = purchase.channel;
-    document.getElementById('item-date').value = purchase.date;
-    document.getElementById('item-notes').value = purchase.notes || '';
-    document.getElementById('item-spec-qty').value = purchase.specQty || '';
-    document.getElementById('item-spec-unit').value = purchase.specUnit || '';
-    document.getElementById('item-is-promo').checked = !!purchase.isPromo;
-    document.getElementById('item-promo-type').value = purchase.promoType || '';
-    document.getElementById('item-actual-paid').value = purchase.actualPaid || '';
-    document.getElementById('promo-fields').style.display = purchase.isPromo ? 'flex' : 'none';
-    setRating(purchase.rating || 0);
-  } else {
-    form.reset();
-    document.getElementById('item-id').value = '';
-    document.getElementById('item-date').value = formatDate(new Date());
-    document.getElementById('item-quantity').value = '1';
-    document.getElementById('promo-fields').style.display = 'none';
-    setRating(0);
-  }
-
-  updateCategorySelect();
-  updateChannelSelect();
-  updateBrandSelect();
-
-  modal.classList.add('show');
-}
-
-/**
- * 关闭购买记录模态框
- */
-export function closePurchaseModal() {
-  const modal = document.getElementById('modal-purchase');
-  if (modal) modal.classList.remove('show');
-  state.editingPurchase = null;
-  hideAutocomplete();
-}
-
-/**
- * 保存购买记录
- */
-export function savePurchase() {
-  const id = document.getElementById('item-id').value;
-  const itemName = document.getElementById('item-name').value.trim();
-  const brand = document.getElementById('item-brand').value.trim();
-  const category = document.getElementById('item-category').value.trim() || '其他';
-  const price = parseFloat(document.getElementById('item-price').value);
-  const quantity = parseInt(document.getElementById('item-quantity').value) || 1;
-  const channel = document.getElementById('item-channel').value.trim() || '其他';
-  const date = document.getElementById('item-date').value;
-  const notes = document.getElementById('item-notes').value.trim();
-  const specQty = parseInt(document.getElementById('item-spec-qty').value) || null;
-  const specUnit = document.getElementById('item-spec-unit').value.trim() || null;
-  const isPromo = document.getElementById('item-is-promo').checked;
-  const promoType = document.getElementById('item-promo-type').value || null;
-  const actualPaid = parseFloat(document.getElementById('item-actual-paid').value) || null;
-  const rating = getRating();
-
-  if (!itemName || !price || !date) {
-    EventBus.emit('toast:show', { message: '请填写必填项', type: 'error' });
-    return;
-  }
-
-  if (isNaN(price) || price <= 0) {
-    EventBus.emit('toast:show', { message: '请输入有效的单价', type: 'error' });
-    return;
-  }
-
-  const categories = Store.getCategories();
-  if (category && !categories.includes(category)) {
-    categories.push(category);
-    Store.saveCategories(categories);
-  }
-
-  const channels = Store.getChannels();
-  if (channel && !channels.includes(channel)) {
-    channels.push(channel);
-    Store.saveChannels(channels);
-  }
-
-  const existingItem = Store.getItemByName(itemName);
-  const itemId = existingItem ? existingItem.id : generateId();
-
-  const purchase = {
-    id: id || generateId(),
-    itemId,
-    itemName,
-    brand,
-    category,
-    price,
-    quantity,
-    totalPrice: price * quantity,
-    channel,
-    date,
-    notes,
-    specQty,
-    specUnit,
-    isPromo,
-    promoType,
-    actualPaid,
-    rating
-  };
-
-  if (id) {
-    Store.updatePurchase(id, purchase);
-  } else {
-    Store.addPurchase(purchase);
-  }
-
-  closePurchaseModal();
-  render();
-}
-
-/**
- * 编辑购买记录
- * @param {string} id - 记录ID
- */
-export function editPurchase(id) {
-  const purchases = Store.getPurchases();
-  const purchase = purchases.find(p => p.id === id);
-  if (purchase) {
-    showPurchaseModal(purchase);
-  }
-}
-
-/**
- * 删除购买记录
- * @param {string} id - 记录ID
- */
-export function deletePurchase(id) {
-  if (confirm('确定要删除这条购买记录吗？')) {
-    Store.deletePurchase(id);
-    render();
-  }
-}
-
-/**
- * 处理商品名称输入（自动补全）
- * @param {string} value - 输入值
- */
-export function handleItemNameInput(value) {
-  if (!value) {
-    hideAutocomplete();
-    return;
-  }
-
-  const items = Store.getItems();
-  const matches = items.filter(item =>
-    item.name.toLowerCase().includes(value.toLowerCase())
-  );
-
-  if (matches.length === 0) {
-    hideAutocomplete();
-    return;
-  }
-
-  showAutocomplete(matches);
-}
-
-/**
- * 显示自动补全列表
- * @param {Array} items - 匹配的商品列表
- */
-function showAutocomplete(items) {
-  const container = document.getElementById('autocomplete-list');
-  const input = document.getElementById('item-name');
-
-  if (!container || !input) return;
-
-  container.innerHTML = items.map(item => `
-    <div class="autocomplete-item" data-name="${escapeHtml(item.name)}" data-category="${escapeHtml(item.category)}">
-      ${escapeHtml(item.name)} <span style="color:var(--text-muted);font-size:12px">${escapeHtml(item.category)}</span>
-    </div>
-  `).join('');
-
-  container.style.display = 'block';
-
-  container.querySelectorAll('.autocomplete-item').forEach(el => {
-    el.addEventListener('click', () => {
-      input.value = el.dataset.name;
-      document.getElementById('item-category').value = el.dataset.category;
-      hideAutocomplete();
-    });
-  });
-}
-
-/**
- * 隐藏自动补全列表
- */
-export function hideAutocomplete() {
-  const container = document.getElementById('autocomplete-list');
-  if (container) {
-    container.style.display = 'none';
-  }
-}
-
-/**
- * 计算总价
- */
-export function calculateTotal() {
-  const price = parseFloat(document.getElementById('item-price').value) || 0;
-  const quantity = parseInt(document.getElementById('item-quantity').value) || 0;
-  const total = price * quantity;
-  const totalInput = document.getElementById('item-total');
-  if (totalInput) totalInput.value = total.toFixed(2);
-}
-
-/**
- * 更新分类选择器
- */
-export function updateCategorySelect() {
-  const datalist = document.getElementById('category-list');
-  if (!datalist) return;
-
-  const categories = Store.getCategories();
-  datalist.innerHTML = categories.map(cat =>
-    `<option value="${escapeHtml(cat)}">`
-  ).join('');
-}
-
-/**
- * 更新渠道选择器
- */
-export function updateChannelSelect() {
-  const datalist = document.getElementById('channel-list');
-  if (!datalist) return;
-
-  const channels = Store.getChannels();
-  datalist.innerHTML = channels.map(ch =>
-    `<option value="${escapeHtml(ch)}">`
-  ).join('');
-}
-
-/**
- * 更新品牌选择器
- */
-export function updateBrandSelect() {
-  const datalist = document.getElementById('brand-list');
-  if (!datalist) return;
-
-  const brands = Store.getBrands();
-  datalist.innerHTML = brands.map(brand =>
-    `<option value="${escapeHtml(brand)}">`
-  ).join('');
-}
-
-/**
  * 分页
- * @param {Array} data - 数据
- * @returns {Array} 当前页数据
  */
 function paginate(data) {
   const total = data.length;
@@ -525,3 +200,11 @@ function paginate(data) {
 
   return pageData;
 }
+
+// 重新导出模态框函数，保持API兼容
+export {
+  showPurchaseModal, closePurchaseModal, savePurchase,
+  editPurchase, deletePurchase, handleItemNameInput,
+  hideAutocomplete, calculateTotal, initRatingStars,
+  updateCategorySelect, updateChannelSelect, updateBrandSelect
+};

@@ -13,6 +13,14 @@ const state = {
   currentMonth: 0
 };
 
+// DOM元素缓存
+const domCache = {
+  statTotalSpending: null,
+  statMonthSpending: null,
+  statPurchaseCount: null,
+  statDailySpending: null
+};
+
 // 图表颜色配置
 const colors = {
   multi: ['#f97316', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#eab308'],
@@ -470,15 +478,18 @@ function updateStatCards() {
     avgDaily = total / dayOfYear;
   }
 
-  const statTotalSpending = document.getElementById('stat-total-spending');
-  const statMonthSpending = document.getElementById('stat-month-spending');
-  const statPurchaseCount = document.getElementById('stat-purchase-count');
-  const statDailySpending = document.getElementById('stat-daily-spending');
+  // 缓存DOM元素
+  if (!domCache.statTotalSpending) {
+    domCache.statTotalSpending = document.getElementById('stat-total-spending');
+    domCache.statMonthSpending = document.getElementById('stat-month-spending');
+    domCache.statPurchaseCount = document.getElementById('stat-purchase-count');
+    domCache.statDailySpending = document.getElementById('stat-daily-spending');
+  }
 
-  if (statTotalSpending) statTotalSpending.textContent = '¥' + total.toLocaleString();
-  if (statMonthSpending) statMonthSpending.textContent = '¥' + monthTotal.toLocaleString();
-  if (statPurchaseCount) statPurchaseCount.textContent = filtered.length;
-  if (statDailySpending) statDailySpending.textContent = '¥' + avgDaily.toFixed(1);
+  if (domCache.statTotalSpending) domCache.statTotalSpending.textContent = '¥' + total.toLocaleString();
+  if (domCache.statMonthSpending) domCache.statMonthSpending.textContent = '¥' + monthTotal.toLocaleString();
+  if (domCache.statPurchaseCount) domCache.statPurchaseCount.textContent = filtered.length;
+  if (domCache.statDailySpending) domCache.statDailySpending.textContent = '¥' + avgDaily.toFixed(1);
 }
 
 /**

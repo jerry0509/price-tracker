@@ -78,7 +78,7 @@ export function render(filters = {}) {
       <td>
         <strong class="item-name-link" onclick="App.showItemHistory('${item.id}')" title="查看购买历史">${escapeHtml(item.name)}</strong>
         ${brandHtml}
-        ${item.specUnit ? `<span class="spec-tag">${item.specUnit}</span>` : ''}
+        ${item.specUnit ? `<span class="spec-tag">${escapeHtml(item.specUnit)}</span>` : ''}
       </td>
       <td><span class="tag">${escapeHtml(item.category)}</span></td>
       <td class="price">${formatPrice(item.maxPrice)}</td>

@@ -1139,13 +1139,13 @@ tr:last-child td { border-bottom: none; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
 .chart-card-scroll {
-  max-height: 420px;
+  max-height: 500px;
   overflow-y: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
   flex: 1;
   display: flex;
-  align-items: center;
+  flex-direction: column;
 }
 .chart-card-scroll::-webkit-scrollbar {
   display: none;
