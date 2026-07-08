@@ -182,7 +182,16 @@
               <col style="width:14%"><col style="width:10%">
             </colgroup>
             <thead><tr>
-              <th>日期</th><th>物品</th><th>品牌</th><th>分类</th><th>单价</th><th>数量</th><th>总价</th><th>渠道</th><th>推荐度</th><th>备注</th><th>操作</th>
+              <th data-sort="date">日期 <span class="sort-arrow">↕</span></th>
+              <th data-sort="itemName">物品 <span class="sort-arrow">↕</span></th>
+              <th data-sort="brand">品牌 <span class="sort-arrow">↕</span></th>
+              <th data-sort="category">分类 <span class="sort-arrow">↕</span></th>
+              <th data-sort="price">单价 <span class="sort-arrow">↕</span></th>
+              <th data-sort="quantity">数量 <span class="sort-arrow">↕</span></th>
+              <th data-sort="totalPrice">总价 <span class="sort-arrow">↕</span></th>
+              <th data-sort="channel">渠道 <span class="sort-arrow">↕</span></th>
+              <th data-sort="rating">推荐度 <span class="sort-arrow">↕</span></th>
+              <th>备注</th><th>操作</th>
             </tr></thead>
             <tbody id="records-tbody"></tbody>
           </table>
@@ -410,7 +419,7 @@
         <div class="form-row">
           <div class="form-group" style="max-width:140px">
             <label>规格数量</label>
-            <input class="input" type="number" id="item-spec-qty" placeholder="如120" min="1">
+            <input class="input" type="number" id="item-spec-qty" placeholder="如120" min="0" step="any">
           </div>
           <div class="form-group" style="max-width:140px">
             <label>规格单位</label>
@@ -488,6 +497,20 @@
         <div class="form-group">
           <label>分类</label>
           <input class="input" id="edit-item-category" list="category-list" autocomplete="off">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>品牌</label>
+          <input class="input" id="edit-item-brand" list="brand-list" placeholder="如：维达、蒙牛" autocomplete="off">
+        </div>
+        <div class="form-group" style="max-width:140px">
+          <label>规格数量</label>
+          <input class="input" type="number" id="edit-item-spec-qty" placeholder="如120" min="0" step="any">
+        </div>
+        <div class="form-group" style="max-width:140px">
+          <label>规格单位</label>
+          <input class="input" id="edit-item-spec-unit" placeholder="抽/枚/ml/kg..." list="spec-unit-list" autocomplete="off">
         </div>
       </div>
       <div class="modal-actions">

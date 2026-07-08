@@ -18,7 +18,8 @@ const state = {
   editingPurchase: null,
   pageSize: 10,
   currentPage: 1,
-  filters: {}
+  filters: {},
+  currentSort: { field: 'date', direction: 'desc' }
 };
 
 /**
@@ -142,13 +143,56 @@ function getFilteredPurchases(filters) {
   }
 
   return purchases.sort((a, b) => {
-    const aTime = a.createdAt || 0;
-    const bTime = b.createdAt || 0;
-    if (aTime !== bTime) return bTime - aTime;
-    const dateDiff = new Date(b.date) - new Date(a.date);
-    if (dateDiff !== 0) return dateDiff;
-    return b.id.localeCompare(a.id);
+    const { field, direction } = state.currentSort;
+    const dir = direction === 'asc' ? 1 : -1;
+
+    let aVal = a[field];
+    let bVal = b[field];
+
+    // 数值字段
+    if (['price', 'quantity', 'totalPrice', 'rating'].includes(field)) {
+      aVal = Number(aVal) || 0;
+      bVal = Number(bVal) || 0;
+      return (aVal - bVal) * dir;
+    }
+
+    // 日期字段
+    if (field === 'date') {
+      return (new Date(aVal) - new Date(bVal)) * dir;
+    }
+
+    // 字符串字段
+    aVal = (aVal || '').toString();
+    bVal = (bVal || '').toString();
+    return aVal.localeCompare(bVal) * dir;
   });
+}
+
+/**
+ * 处理排序
+ */
+export function handleSort(field) {
+  if (state.currentSort.field === field) {
+    state.currentSort.direction = state.currentSort.direction === 'asc' ? 'desc' : 'asc';
+  } else {
+    state.currentSort.field = field;
+    state.currentSort.direction = 'desc';
+  }
+
+  // 更新表头样式
+  document.querySelectorAll('#records-tbody').forEach(() => {});
+  const ths = document.querySelectorAll('[data-sort]');
+  ths.forEach(th => {
+    th.classList.toggle('sorted', th.dataset.sort === field);
+    const arrow = th.querySelector('.sort-arrow');
+    if (arrow) {
+      arrow.textContent = th.dataset.sort === field
+        ? (state.currentSort.direction === 'asc' ? '↑' : '↓')
+        : '↕';
+    }
+  });
+
+  render(state.filters);
 }
 
 /**
@@ -203,8 +247,31 @@ function paginate(data) {
 
 // 重新导出模态框函数，保持API兼容
 export {
-  showPurchaseModal, closePurchaseModal, savePurchase,
-  editPurchase, deletePurchase, handleItemNameInput,
+  savePurchase, deletePurchase, handleItemNameInput,
   hideAutocomplete, calculateTotal, initRatingStars,
   updateCategorySelect, updateChannelSelect, updateBrandSelect
 };
+
+// 包装函数，自动传递state参数
+export function editPurchaseWrapper(id) {
+  editPurchase(id, state);
+}
+
+// 为了保持向后兼容，也导出editPurchase
+export { editPurchaseWrapper as editPurchase };
+
+// 包装showPurchaseModal，自动传递state参数
+export function showPurchaseModalWrapper(purchase) {
+  showPurchaseModal(purchase, state);
+}
+
+// 为了保持向后兼容，也导出showPurchaseModal
+export { showPurchaseModalWrapper as showPurchaseModal };
+
+// 包装closePurchaseModal，自动传递state参数
+export function closePurchaseModalWrapper() {
+  closePurchaseModal(state);
+}
+
+// 为了保持向后兼容，也导出closePurchaseModal
+export { closePurchaseModalWrapper as closePurchaseModal };

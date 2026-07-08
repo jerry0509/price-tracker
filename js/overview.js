@@ -323,16 +323,16 @@ export function editItem(itemId) {
   state.editingItem = item;
   const modal = document.getElementById('modal-edit-item');
   const nameInput = document.getElementById('edit-item-name');
-  const categorySelect = document.getElementById('edit-item-category');
+  const categoryInput = document.getElementById('edit-item-category');
+  const brandInput = document.getElementById('edit-item-brand');
+  const specQtyInput = document.getElementById('edit-item-spec-qty');
+  const specUnitInput = document.getElementById('edit-item-spec-unit');
 
   if (nameInput) nameInput.value = item.name;
-  if (categorySelect) {
-    // 更新分类选项
-    const categories = Store.getCategories();
-    categorySelect.innerHTML = categories.map(cat =>
-      `<option value="${escapeHtml(cat)}" ${cat === item.category ? 'selected' : ''}>${escapeHtml(cat)}</option>`
-    ).join('');
-  }
+  if (categoryInput) categoryInput.value = item.category || '';
+  if (brandInput) brandInput.value = item.mainBrand || '';
+  if (specQtyInput) specQtyInput.value = item.specQty || '';
+  if (specUnitInput) specUnitInput.value = item.specUnit || '';
 
   if (modal) modal.classList.add('show');
 }
@@ -353,10 +353,16 @@ export function saveEditItem() {
   if (!state.editingItem) return;
 
   const nameInput = document.getElementById('edit-item-name');
-  const categorySelect = document.getElementById('edit-item-category');
+  const categoryInput = document.getElementById('edit-item-category');
+  const brandInput = document.getElementById('edit-item-brand');
+  const specQtyInput = document.getElementById('edit-item-spec-qty');
+  const specUnitInput = document.getElementById('edit-item-spec-unit');
 
   const name = nameInput?.value.trim();
-  const category = categorySelect?.value.trim() || '其他';
+  const category = categoryInput?.value.trim() || '其他';
+  const brand = brandInput?.value.trim() || '';
+  const specQty = parseFloat(specQtyInput?.value) || null;
+  const specUnit = specUnitInput?.value.trim() || null;
 
   if (!name) {
     EventBus.emit('toast:show', { message: '物品名称不能为空', type: 'error' });
@@ -374,12 +380,16 @@ export function saveEditItem() {
     if (p.itemId === state.editingItem.id) {
       p.itemName = name;
       p.category = category;
+      p.brand = brand;
+      p.specQty = specQty;
+      p.specUnit = specUnit;
     }
   });
 
   Store.savePurchases(purchases);
   closeEditItemModal();
   render();
+  EventBus.emit('toast:show', { message: '✅ 保存成功', type: 'success' });
 }
 
 /**
@@ -394,6 +404,7 @@ export function deleteItem(itemId) {
   if (confirm(`确定要删除「${item.name}」吗？将同时删除该物品的 ${count} 条购买记录。`)) {
     Store.deleteItem(itemId);
     render();
+    EventBus.emit('toast:show', { message: `✅ 已删除「${item.name}」`, type: 'success' });
   }
 }
 

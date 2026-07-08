@@ -35,15 +35,15 @@ export function getAITemplate() {
 
 要求：
 1. 每条记录包含以下字段：
-   - itemName: 物品名称（字符串）
-   - brand: 品牌（可选，如蓝月亮、维达、海飞丝等）
+   - itemName: 物品通用名称（简短，2-4个字，如"洗发水""抽纸""牛奶""酱油"，不要包含品牌、规格、口味等修饰词）
+   - brand: 品牌（单独提取，如"海飞丝""维达""蒙牛""李锦记"）
    - category: 分类（从以下选项中选择：${categories.join('、')}）
    - price: 单价（数字，单位元）
    - quantity: 数量（整数）
    - channel: 购买渠道（从以下选项中选择：${channels.join('、')}）
    - date: 购买日期（格式 YYYY-MM-DD，如果小票没有日期则用今天）
-   - notes: 备注（可选，如有特殊说明则填写）
-   - specQty: 规格数量（可选，如120抽、250ml、30枚等中的数字）
+   - notes: 备注（可选，放口味、规格描述、促销说明等，如"去屑型750ml""红富士""东北大米5kg"）
+   - specQty: 规格数量（可选，如120抽、250ml、30枚等中的数字部分）
    - specUnit: 规格单位（可选，如抽、ml、枚、g、kg、片、包、卷）
    - isPromo: 是否促销（可选，true/false）
    - promoType: 促销方式（可选，如买一送一、限时特价、满减等）
@@ -59,7 +59,7 @@ export function getAITemplate() {
     "quantity": 10,
     "channel": "京东",
     "date": "2026-06-30",
-    "notes": "618囤货",
+    "notes": "超韧，618囤货",
     "specQty": 120,
     "specUnit": "抽",
     "isPromo": true,
@@ -68,7 +68,15 @@ export function getAITemplate() {
   }
 ]
 
-3. 注意事项：
+3. ⚠️ 名称拆分规则（重要）：
+   - "海飞丝去屑洗发水750ml" → itemName: "洗发水", brand: "海飞丝", notes: "去屑型", specQty: 750, specUnit: "ml"
+   - "维达超韧抽纸120抽" → itemName: "抽纸", brand: "维达", notes: "超韧", specQty: 120, specUnit: "抽"
+   - "蒙牛纯牛奶1000ml" → itemName: "牛奶", brand: "蒙牛", notes: "纯牛奶", specQty: 1000, specUnit: "ml"
+   - "金龙鱼东北大米5kg" → itemName: "大米", brand: "金龙鱼", notes: "东北大米", specQty: 5, specUnit: "kg"
+   - "乐事原味薯片75g" → itemName: "薯片", brand: "乐事", notes: "原味", specQty: 75, specUnit: "g"
+   - "农夫山泉矿泉水550ml×24" → itemName: "矿泉水", brand: "农夫山泉", specQty: 550, specUnit: "ml"
+
+4. 注意事项：
    - 如果小票显示的是总价而非单价，请用总价除以数量得到单价
    - 如果无法确定品牌，brand字段可以留空或省略
    - 如果无法确定分类，默认填"其他"

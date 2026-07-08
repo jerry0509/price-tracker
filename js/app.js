@@ -32,6 +32,17 @@ function init() {
   initFilters();
   initModules();
   render();
+
+  // 数据变更时全局刷新筛选和视图
+  const refresh = () => {
+    initFilters();
+    Overview.render(state.filters);
+    Records.render(state.filters);
+  };
+  EventBus.on('purchase:added', refresh);
+  EventBus.on('purchase:updated', refresh);
+  EventBus.on('purchase:deleted', refresh);
+  EventBus.on('data:imported', refresh);
 }
 
 /**
@@ -122,10 +133,21 @@ function bindEvents() {
     Records.render(state.filters);
   });
 
-  // 排序
-  document.querySelectorAll('[data-sort]').forEach(th => {
-    th.addEventListener('click', () => Overview.handleSort(th.dataset.sort));
-  });
+  // 排序 - 总览
+  const overviewTable = document.getElementById('overview-tbody')?.closest('table');
+  if (overviewTable) {
+    overviewTable.querySelectorAll('th[data-sort]').forEach(th => {
+      th.addEventListener('click', () => Overview.handleSort(th.dataset.sort));
+    });
+  }
+
+  // 排序 - 购买记录
+  const recordsTable = document.getElementById('records-tbody')?.closest('table');
+  if (recordsTable) {
+    recordsTable.querySelectorAll('th[data-sort]').forEach(th => {
+      th.addEventListener('click', () => Records.handleSort(th.dataset.sort));
+    });
+  }
 
   // ESC关闭模态框
   document.addEventListener('keydown', e => {
@@ -142,7 +164,11 @@ function bindEvents() {
   // 购买记录表单提交
   document.getElementById('purchase-form')?.addEventListener('submit', e => {
     e.preventDefault();
-    Records.savePurchase();
+    const result = Records.savePurchase();
+    if (result) {
+      Records.closePurchaseModal();
+      showToast('✅ 保存成功', 'success');
+    }
   });
 
   // 促销复选框
@@ -230,7 +256,10 @@ function initFilters() {
       ).join('');
   });
 
-  const channels = Store.getChannels();
+  const allChannels = Store.getChannels();
+  const purchases = Store.getPurchases();
+  const usedChannels = new Set(purchases.map(p => p.channel));
+  const channels = allChannels.filter(ch => usedChannels.has(ch));
   channelSelects.forEach(select => {
     const current = select.value;
     select.innerHTML = '<option value="">全部渠道</option>' +
@@ -391,11 +420,13 @@ function showToast(message, type = 'success') {
 function goPage(tab, delta) {
   if (tab === 'overview') {
     const overviewState = Overview.getState();
-    Overview.setCurrentPage(overviewState.currentPage + delta);
+    const page = Math.max(1, overviewState.currentPage + delta);
+    Overview.setCurrentPage(page);
     Overview.render(state.filters);
   } else {
     const recordsState = Records.getState();
-    Records.setCurrentPage(recordsState.currentPage + delta);
+    const page = Math.max(1, recordsState.currentPage + delta);
+    Records.setCurrentPage(page);
     Records.render(state.filters);
   }
 }
@@ -447,7 +478,11 @@ window.App = {
   closePurchaseModal: () => Records.closePurchaseModal(),
   savePurchase: () => Records.savePurchase(),
   editPurchase: (id) => Records.editPurchase(id),
-  deletePurchase: (id) => Records.deletePurchase(id),
+  deletePurchase: (id) => {
+    if (Records.deletePurchase(id)) {
+      showToast('✅ 已删除', 'success');
+    }
+  },
   // AiImport 模块方法
   getAITemplate: () => AiImport.getAITemplate(),
   copyAITemplate: () => AiImport.copyAITemplate(),

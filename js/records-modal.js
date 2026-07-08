@@ -161,7 +161,7 @@ export function savePurchase() {
   const channel = document.getElementById('item-channel')?.value.trim() || '其他';
   const date = dateEl.value;
   const notes = document.getElementById('item-notes')?.value.trim() || '';
-  const specQty = parseInt(document.getElementById('item-spec-qty')?.value) || null;
+  const specQty = parseFloat(document.getElementById('item-spec-qty')?.value) || null;
   const specUnit = document.getElementById('item-spec-unit')?.value.trim() || null;
   const isPromo = document.getElementById('item-is-promo')?.checked || false;
   const promoType = document.getElementById('item-promo-type')?.value || null;
